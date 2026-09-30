@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Code Studio Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Vazirmatn', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 md:p-8 flex flex-col items-center justify-center">
+
+  <div class="max-w-5xl w-full mx-auto">
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 class="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500 bg-clip-text text-transparent">
+        استودیو ساخت QR کد حرفه‌ای
+      </h1>
+      <p class="text-slate-400 mt-2 text-sm md:text-base">سریع، دائمی، مدرن و بدون انقضا</p>
+    </header>
+
+    <!-- Main Container -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+      
+      <!-- Settings Column -->
+      <div class="lg:col-span-7 space-y-6">
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">متن یا آدرس لینک (URL)</label>
+          <input 
+            type="text" 
+            id="qr-data" 
+            placeholder="https://example.com" 
+            value="https://github.com" 
+            class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:outline-none text-white text-left font-mono text-sm"
+          />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Dots Style -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">طرح نقطه‌ها</label>
+            <select id="dots-type" class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-slate-200">
+              <option value="rounded" selected>گرد و نرم (Rounded)</option>
+              <option value="dots">نقطه‌ای دایره‌ای (Dots)</option>
+              <option value="classy">کلاسیک زاویه‌دار (Classy)</option>
+              <option value="square">مربعی استاندارد (Square)</option>
+              <option value="extra-rounded">فوق‌العاده گرد (Extra Rounded)</option>
+            </select>
+          </div>
+
+          <!-- Corners Style -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">طرح گوشه‌ها</label>
+            <select id="corners-type" class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-slate-200">
+              <option value="extra-rounded" selected>گوشه گرد</option>
+              <option value="dot">گوشه دایره‌ای</option>
+              <option value="square">گوشه مربعی</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Colors -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
+            <label class="block text-xs font-semibold text-slate-400 mb-2">رنگ QR Code</label>
+            <div class="flex items-center gap-3">
+              <input type="color" id="qr-color" value="#06b6d4" class="w-10 h-10 rounded-lg cursor-pointer bg-transparent border-0" />
+              <span id="qr-color-val" class="font-mono text-xs text-slate-300">#06b6d4</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
+            <label class="block text-xs font-semibold text-slate-400 mb-2">رنگ پس‌زمینه</label>
+            <div class="flex items-center gap-3">
+              <input type="color" id="bg-color" value="#ffffff" class="w-10 h-10 rounded-lg cursor-pointer bg-transparent border-0" />
+              <span id="bg-color-val" class="font-mono text-xs text-slate-300">#ffffff</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Logo Upload -->
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">لوگوی وسط (اختیاری)</label>
+          <div class="flex items-center gap-4">
+            <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 px-4 py-2.5 rounded-xl text-sm font-semibold transition">
+              انتخاب عکس لوگو
+              <input type="file" id="logo-input" accept="image/*" class="hidden" />
+            </label>
+            <button id="remove-logo" class="text-xs text-red-400 hover:underline hidden">حذف لوگو</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview & Download Column -->
+      <div class="lg:col-span-5 flex flex-col items-center justify-between border-t lg:border-t-0 lg:border-r border-slate-800 pt-6 lg:pt-0 lg:pr-8">
+        <div class="text-center w-full">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">پیش‌نمایش زنده</span>
+          <div class="mt-4 p-4 bg-white rounded-2xl shadow-xl flex items-center justify-center max-w-[280px] sm:max-w-[320px] mx-auto aspect-square" id="canvas-container">
+            <!-- QR renders here -->
+          </div>
+        </div>
+
+        <!-- Download Buttons -->
+        <div class="w-full mt-6 flex flex-col sm:flex-row gap-3">
+          <button id="btn-png" class="flex-1 py-3 px-4 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl shadow-lg transition active:scale-95 text-center">
+            دانلود PNG
+          </button>
+          <button id="btn-svg" class="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700 transition active:scale-95 text-center">
+            دانلود SVG (برداری)
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    let logoDataUrl = "";
+
+    const qrCode = new QRCodeStyling({
+      width: 260,
+      height: 260,
+      type: "canvas",
+      data: document.getElementById("qr-data").value,
+      dotsOptions: {
+        color: document.getElementById("qr-color").value,
+        type: document.getElementById("dots-type").value
+      },
+      backgroundOptions: {
+        color: document.getElementById("bg-color").value,
+      },
+      cornersSquareOptions: {
+        type: document.getElementById("corners-type").value
+      },
+      imageOptions: {
+        crossOrigin: "anonymous",
+        margin: 5
+      }
+    });
+
+    const container = document.getElementById("canvas-container");
+    qrCode.append(container);
+
+    function updateQR() {
+      qrCode.update({
+        data: document.getElementById("qr-data").value || " ",
+        dotsOptions: {
+          color: document.getElementById("qr-color").value,
+          type: document.getElementById("dots-type").value
+        },
+        backgroundOptions: {
+          color: document.getElementById("bg-color").value
+        },
+        cornersSquareOptions: {
+          type: document.getElementById("corners-type").value
+        },
+        image: logoDataUrl || null
+      });
+    }
+
+    // Event Listeners
+    document.getElementById("qr-data").addEventListener("input", updateQR);
+    document.getElementById("dots-type").addEventListener("change", updateQR);
+    document.getElementById("corners-type").addEventListener("change", updateQR);
+
+    document.getElementById("qr-color").addEventListener("input", (e) => {
+      document.getElementById("qr-color-val").textContent = e.target.value;
+      updateQR();
+    });
+
+    document.getElementById("bg-color").addEventListener("input", (e) => {
+      document.getElementById("bg-color-val").textContent = e.target.value;
+      updateQR();
+    });
+
+    document.getElementById("logo-input").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          logoDataUrl = reader.result;
+          document.getElementById("remove-logo").classList.remove("hidden");
+          updateQR();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById("remove-logo").addEventListener("click", () => {
+      logoDataUrl = "";
+      document.getElementById("logo-input").value = "";
+      document.getElementById("remove-logo").classList.add("hidden");
+      updateQR();
+    });
+
+    document.getElementById("btn-png").addEventListener("click", () => {
+      qrCode.download({ name: "qrcode", extension: "png" });
+    });
+
+    document.getElementById("btn-svg").addEventListener("click", () => {
+      qrCode.download({ name: "qrcode", extension: "svg" });
+    });
+  </script>
+</body>
+</html>
