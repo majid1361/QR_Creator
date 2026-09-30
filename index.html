@@ -14,17 +14,36 @@
   <!-- CDN Scripts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     body { 
       font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 75%, #000000 100%);
+      background-attachment: fixed;
     }
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-    input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
+    input[type="color"]::-webkit-color-swatch { border: none; border-radius: 10px; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    /* Glass Effect Utilities */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-panel {
+      background: rgba(2, 6, 23, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.25);
+    }
   </style>
 
   <!-- Manifest Auto-Inject for PWA -->
@@ -55,109 +74,111 @@
   </script>
 </head>
 
-<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 md:p-8 flex flex-col items-center justify-start antialiased selection:bg-cyan-500 selection:text-black">
+<body class="text-slate-100 min-h-screen p-3 sm:p-6 md:p-8 flex flex-col items-center justify-start antialiased selection:bg-cyan-500 selection:text-black">
 
   <!-- Mobile Install Banner -->
-  <div id="install-banner" class="hidden w-full max-w-5xl mb-4 bg-gradient-to-r from-cyan-900/60 to-blue-900/60 border border-cyan-500/40 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between shadow-lg">
-    <div class="flex items-center gap-3">
-      <span class="text-2xl">📱</span>
+  <div id="install-banner" class="hidden w-full max-w-5xl mb-5 glass-card border-cyan-500/30 rounded-2xl p-4 flex items-center justify-between shadow-2xl transition-all">
+    <div class="flex items-center gap-3.5">
+      <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-xl shadow-inner">
+        📱
+      </div>
       <div>
         <p class="font-bold text-sm text-cyan-200">نصب نسخه اپلیکیشن روی گوشی</p>
-        <p class="text-xs text-slate-300">سریع، آفلاین و بدون نیاز به استور</p>
+        <p class="text-xs text-slate-400 mt-0.5">سریع، آفلاین و بدون نیاز به استور</p>
       </div>
     </div>
-    <button id="btn-install" class="bg-cyan-400 hover:bg-cyan-300 active:scale-95 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs shadow-md transition">
+    <button id="btn-install" class="bg-gradient-to-r from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 active:scale-95 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs shadow-lg shadow-cyan-500/20 transition">
       نصب روی موبایل
     </button>
   </div>
 
-  <div class="max-w-5xl w-full mx-auto">
+  <div class="max-w-5xl w-full mx-auto space-y-6">
     <!-- Header -->
-    <header class="text-center mb-6">
-      <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-900 border border-slate-800 rounded-full text-xs font-semibold text-cyan-400 mb-2">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+    <header class="text-center">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 bg-slate-900/80 border border-slate-700/50 rounded-full text-xs font-semibold text-cyan-400 mb-3 shadow-inner">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         پشتیبانی از انواع فرمت‌های هوشمند و حاشیه امن
       </div>
-      <h1 class="text-2xl sm:text-4xl font-extrabold bg-gradient-to-r from-cyan-400 via-sky-400 to-indigo-500 bg-clip-text text-transparent tracking-tight">
+      <h1 class="text-3xl sm:text-5xl font-black bg-gradient-to-r from-white via-cyan-200 to-cyan-400 bg-clip-text text-transparent tracking-tight">
         استودیو همه‌کاره QR کد
       </h1>
-      <p class="text-slate-400 mt-1 text-xs sm:text-sm">ساخت بارکدهای هوشمند وای‌فای، تماس، لوکیشن، ارز دیجیتال و لینک</p>
+      <p class="text-slate-400 mt-2 text-xs sm:text-sm max-w-md mx-auto leading-relaxed">تولید اختصاصی بارکدهای هوشمند با رزولوشن فوق‌العاده و استانداردهای چاپی</p>
     </header>
 
     <!-- Category Selector (Grid/Tabs) -->
-    <div class="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-10 gap-2 mb-6" id="type-tabs">
-      <button data-type="url" class="tab-btn active bg-cyan-500 text-slate-950 flex flex-col items-center justify-center p-2.5 rounded-2xl border border-cyan-400/50 shadow-lg shadow-cyan-500/10 font-bold text-xs transition">
+    <div class="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-10 gap-2 p-1.5 glass-card rounded-2xl" id="type-tabs">
+      <button data-type="url" class="tab-btn active bg-cyan-500 text-slate-950 flex flex-col items-center justify-center p-2.5 rounded-xl border border-cyan-300/40 shadow-lg shadow-cyan-500/20 font-bold text-xs transition duration-200">
         <span class="text-lg mb-1">🔗</span>
         <span>وب‌سایت</span>
       </button>
-      <button data-type="text" class="tab-btn bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 flex flex-col items-center justify-center p-2.5 rounded-2xl font-semibold text-xs transition">
+      <button data-type="text" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
         <span class="text-lg mb-1">📝</span>
         <span>متن</span>
       </button>
-      <button data-type="wifi" class="tab-btn bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 flex flex-col items-center justify-center p-2.5 rounded-2xl font-semibold text-xs transition">
+      <button data-type="wifi" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
         <span class="text-lg mb-1">📶</span>
         <span>وای‌فای</span>
       </button>
-      <button data-type="phone" class="tab-btn bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 flex flex-col items-center justify-center p-2.5 rounded-2xl font-semibold text-xs transition">
+      <button data-type="phone" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
         <span class="text-lg mb-1">📞</span>
         <span>تماس</span>
       </button>
-      <button data-type="sms" class="tab-btn bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 flex flex-col items-center justify-center p-2.5 rounded-2xl font-semibold text-xs transition">
+      <button data-type="sms" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
         <span class="text-lg mb-1">💬</span>
         <span>پیامک</span>
       </button>
-      <button data-type="email" class="tab-btn bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 flex flex-col items-center justify-center p-2.5 rounded-2xl font-semibold text-xs transition">
+      <button data-type="email" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
         <span class="text-lg mb-1">✉️</span>
         <span>ایمیل</span>
       </button>
-      <button data-type="vcard" class="tab-btn bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 flex flex-col items-center justify-center p-2.5 rounded-2xl font-semibold text-xs transition">
+      <button data-type="vcard" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
         <span class="text-lg mb-1">👤</span>
         <span>مخاطب</span>
       </button>
-      <button data-type="location" class="tab-btn bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 flex flex-col items-center justify-center p-2.5 rounded-2xl font-semibold text-xs transition">
+      <button data-type="location" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
         <span class="text-lg mb-1">📍</span>
         <span>لوکیشن</span>
       </button>
-      <button data-type="event" class="tab-btn bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 flex flex-col items-center justify-center p-2.5 rounded-2xl font-semibold text-xs transition">
+      <button data-type="event" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
         <span class="text-lg mb-1">📅</span>
         <span>رویداد</span>
       </button>
-      <button data-type="crypto" class="tab-btn bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 flex flex-col items-center justify-center p-2.5 rounded-2xl font-semibold text-xs transition">
+      <button data-type="crypto" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
         <span class="text-lg mb-1">🪙</span>
         <span>کریپتو</span>
       </button>
     </div>
 
     <!-- Main Workspace -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-900/90 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-5 sm:p-7 shadow-2xl">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 glass-card rounded-3xl p-5 sm:p-7 shadow-2xl">
       
       <!-- Input Controls (Column 1) -->
       <div class="lg:col-span-7 space-y-5">
         
         <!-- Dynamic Type Form Sections -->
-        <div class="bg-slate-950/80 p-4 sm:p-5 rounded-2xl border border-slate-800">
+        <div class="glass-panel p-4 sm:p-5 rounded-2xl border border-slate-800/80 shadow-inner">
           
           <!-- 1. URL -->
           <div id="form-url" class="type-form space-y-3">
             <label class="block text-xs font-bold text-slate-300">آدرس وب‌سایت یا لینک اینترنتی</label>
-            <input type="text" id="input-url" placeholder="https://example.com" value="https://github.com" class="w-full px-4 py-3 bg-slate-900 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:outline-none text-white text-left font-mono text-sm" />
+            <input type="text" id="input-url" placeholder="https://example.com" value="https://github.com" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white text-left font-mono text-sm transition" />
           </div>
 
           <!-- 2. TEXT -->
           <div id="form-text" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">متن دلخواه یا توضیحات</label>
-            <textarea id="input-text" rows="3" placeholder="متن مورد نظرتان را اینجا بنویسید..." class="w-full px-4 py-3 bg-slate-900 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:outline-none text-white text-sm"></textarea>
+            <textarea id="input-text" rows="3" placeholder="متن مورد نظرتان را اینجا بنویسید..." class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white text-sm transition"></textarea>
           </div>
 
           <!-- 3. WIFI -->
           <div id="form-wifi" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">مشخصات شبکه وای‌فای (اتصال مستقیم گوشی)</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input type="text" id="wifi-ssid" placeholder="نام شبکه (SSID)" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-sm" />
-              <input type="text" id="wifi-pass" placeholder="رمز عبور وای‌فای" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-sm" />
+              <input type="text" id="wifi-ssid" placeholder="نام شبکه (SSID)" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
+              <input type="text" id="wifi-pass" placeholder="رمز عبور وای‌فای" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
             </div>
             <div class="flex items-center gap-4 text-xs text-slate-300 pt-1">
-              <span class="font-semibold">نوع امنیت:</span>
+              <span class="font-semibold text-slate-400">نوع امنیت:</span>
               <label class="flex items-center gap-1.5 cursor-pointer">
                 <input type="radio" name="wifi-type" value="WPA" checked class="text-cyan-500 focus:ring-0"> WPA/WPA2
               </label>
@@ -173,32 +194,32 @@
           <!-- 4. PHONE -->
           <div id="form-phone" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">شماره تلفن (تماس فوری)</label>
-            <input type="tel" id="input-phone" placeholder="09120000000 یا +989120000000" class="w-full px-4 py-3 bg-slate-900 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-left font-mono text-sm" />
+            <input type="tel" id="input-phone" placeholder="09120000000 یا +989120000000" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-sm transition" />
           </div>
 
           <!-- 5. SMS -->
           <div id="form-sms" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">ارسال پیامک آماده</label>
-            <input type="tel" id="sms-phone" placeholder="شماره گیرنده" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-left font-mono text-sm mb-2" />
-            <textarea id="sms-body" rows="2" placeholder="متن پیش‌فرض پیامک..." class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-sm"></textarea>
+            <input type="tel" id="sms-phone" placeholder="شماره گیرنده" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-sm mb-2 transition" />
+            <textarea id="sms-body" rows="2" placeholder="متن پیش‌فرض پیامک..." class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition"></textarea>
           </div>
 
           <!-- 6. EMAIL -->
           <div id="form-email" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">ارسال ایمیل</label>
-            <input type="email" id="email-to" placeholder="آدرس ایمیل گیرنده" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-left font-mono text-sm" />
-            <input type="text" id="email-subject" placeholder="موضوع ایمیل" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-sm" />
-            <textarea id="email-body" rows="2" placeholder="متن پیام..." class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-sm"></textarea>
+            <input type="email" id="email-to" placeholder="آدرس ایمیل گیرنده" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-sm transition" />
+            <input type="text" id="email-subject" placeholder="موضوع ایمیل" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
+            <textarea id="email-body" rows="2" placeholder="متن پیام..." class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition"></textarea>
           </div>
 
           <!-- 7. VCARD / CONTACT -->
           <div id="form-vcard" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">کارت ویزیت هوشمند (vCard مخاطب)</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input type="text" id="vcard-fn" placeholder="نام و نام خانوادگی" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-sm" />
-              <input type="tel" id="vcard-tel" placeholder="شماره تماس" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-left font-mono text-sm" />
-              <input type="email" id="vcard-email" placeholder="ایمیل" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-left text-sm" />
-              <input type="text" id="vcard-org" placeholder="نام شرکت / شغل" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-sm" />
+              <input type="text" id="vcard-fn" placeholder="نام و نام خانوادگی" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
+              <input type="tel" id="vcard-tel" placeholder="شماره تماس" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-sm transition" />
+              <input type="email" id="vcard-email" placeholder="ایمیل" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left text-sm transition" />
+              <input type="text" id="vcard-org" placeholder="نام شرکت / شغل" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
             </div>
           </div>
 
@@ -206,41 +227,41 @@
           <div id="form-location" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">مختصات نقشه (Google Maps Navigation)</label>
             <div class="grid grid-cols-2 gap-3">
-              <input type="number" step="any" id="loc-lat" placeholder="عرض جغرافیایی (Lat) مثل 35.6892" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white font-mono text-sm" />
-              <input type="number" step="any" id="loc-lng" placeholder="طول جغرافیایی (Lng) مثل 51.3890" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white font-mono text-sm" />
+              <input type="number" step="any" id="loc-lat" placeholder="عرض جغرافیایی (Lat) مثل 35.6892" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white font-mono text-sm transition" />
+              <input type="number" step="any" id="loc-lng" placeholder="طول جغرافیایی (Lng) مثل 51.3890" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white font-mono text-sm transition" />
             </div>
           </div>
 
           <!-- 9. EVENT -->
           <div id="form-event" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">ثبت رویداد در تقویم (Calendar Event)</label>
-            <input type="text" id="event-title" placeholder="عنوان رویداد یا جلسه" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-sm" />
+            <input type="text" id="event-title" placeholder="عنوان رویداد یا جلسه" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <span class="text-[11px] text-slate-400 block mb-1">زمان شروع:</span>
-                <input type="datetime-local" id="event-start" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-xs" />
+                <input type="datetime-local" id="event-start" class="w-full px-3 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-xs transition" />
               </div>
               <div>
                 <span class="text-[11px] text-slate-400 block mb-1">زمان پایان:</span>
-                <input type="datetime-local" id="event-end" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-xs" />
+                <input type="datetime-local" id="event-end" class="w-full px-3 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-xs transition" />
               </div>
             </div>
-            <input type="text" id="event-location" placeholder="محل برگزاری (اختیاری)" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-sm" />
+            <input type="text" id="event-location" placeholder="محل برگزاری (اختیاری)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
           </div>
 
           <!-- 10. CRYPTO -->
           <div id="form-crypto" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">درگاه پرداخت و کیف پول رمزارز</label>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <select id="crypto-coin" class="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white text-sm">
+              <select id="crypto-coin" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition">
                 <option value="bitcoin">Bitcoin (BTC)</option>
                 <option value="ethereum">Ethereum (ETH)</option>
                 <option value="tether">Tether (USDT-TRC20)</option>
                 <option value="tron">Tron (TRX)</option>
               </select>
-              <input type="text" id="crypto-address" placeholder="آدرس والت (Wallet Address)" class="sm:col-span-2 w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white font-mono text-left text-xs" />
+              <input type="text" id="crypto-address" placeholder="آدرس والت (Wallet Address)" class="sm:col-span-2 w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white font-mono text-left text-xs transition" />
             </div>
-            <input type="number" step="any" id="crypto-amount" placeholder="مقدار پیش‌فرض (اختیاری)" class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-cyan-400 text-white font-mono text-left text-xs" />
+            <input type="number" step="any" id="crypto-amount" placeholder="مقدار پیش‌فرض (اختیاری)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white font-mono text-left text-xs transition" />
           </div>
 
         </div>
@@ -249,7 +270,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-2">طرح نقطه‌ها (Dots)</label>
-            <select id="dots-type" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-cyan-400 text-slate-200 text-sm transition">
+            <select id="dots-type" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-slate-200 text-sm transition">
               <option value="rounded" selected>مدرن و گرد (Rounded)</option>
               <option value="dots">دایره کامل (Dots)</option>
               <option value="classy">زاویه‌دار کلاسیک (Classy)</option>
@@ -260,7 +281,7 @@
 
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-2">طرح گوشه‌ها (Corners)</label>
-            <select id="corners-type" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-cyan-400 text-slate-200 text-sm transition">
+            <select id="corners-type" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-slate-200 text-sm transition">
               <option value="extra-rounded" selected>گوشه نیم‌گرد</option>
               <option value="dot">گوشه دایره‌ای</option>
               <option value="square">گوشه تیز هندسی</option>
@@ -272,7 +293,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-2">حاشیه سفید اطراف (Quiet Zone)</label>
-            <select id="qr-margin" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-cyan-400 text-slate-200 text-sm transition">
+            <select id="qr-margin" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-slate-200 text-sm transition">
               <option value="15">حاشیه ملایم (15px)</option>
               <option value="25" selected>حاشیه استاندارد و چاپ (25px)</option>
               <option value="35">حاشیه عریض (35px)</option>
@@ -282,7 +303,7 @@
 
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-2">کیفیت دانلود خروجی (رزولوشن)</label>
-            <select id="qr-size" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700/80 rounded-xl focus:ring-2 focus:ring-cyan-400 text-slate-200 text-sm transition">
+            <select id="qr-size" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-slate-200 text-sm transition">
               <option value="1200">بسیار بالا - 1200px (مناسب وب و موبایل)</option>
               <option value="2000" selected>فوق‌العاده شفاف - 2000px (مخصوص چاپ)</option>
               <option value="3000">کیفیت اولترا HD - 3000px (بنر و کاتالوگ)</option>
@@ -292,36 +313,36 @@
 
         <!-- Color Palette -->
         <div class="grid grid-cols-2 gap-4">
-          <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800">
+          <div class="glass-panel p-3.5 rounded-2xl border border-slate-800/80">
             <label class="block text-xs font-semibold text-slate-400 mb-2">رنگ ماتریس</label>
             <div class="flex items-center gap-3">
-              <input type="color" id="qr-color" value="#000000" class="w-9 h-9 rounded-xl cursor-pointer bg-transparent border border-slate-700" />
-              <span id="qr-color-val" class="font-mono text-xs text-slate-300 uppercase">#000000</span>
+              <input type="color" id="qr-color" value="#000000" class="w-9 h-9 rounded-xl cursor-pointer bg-transparent border border-slate-700/80 shadow-sm" />
+              <span id="qr-color-val" class="font-mono text-xs text-slate-300 uppercase font-semibold">#000000</span>
             </div>
           </div>
 
-          <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800">
+          <div class="glass-panel p-3.5 rounded-2xl border border-slate-800/80">
             <label class="block text-xs font-semibold text-slate-400 mb-2">رنگ پس‌زمینه</label>
             <div class="flex items-center gap-3">
-              <input type="color" id="bg-color" value="#ffffff" class="w-9 h-9 rounded-xl cursor-pointer bg-transparent border border-slate-700" />
-              <span id="bg-color-val" class="font-mono text-xs text-slate-300 uppercase">#FFFFFF</span>
+              <input type="color" id="bg-color" value="#ffffff" class="w-9 h-9 rounded-xl cursor-pointer bg-transparent border border-slate-700/80 shadow-sm" />
+              <span id="bg-color-val" class="font-mono text-xs text-slate-300 uppercase font-semibold">#FFFFFF</span>
             </div>
           </div>
         </div>
 
         <!-- Center Logo Upload -->
-        <div class="bg-slate-950/50 p-3.5 rounded-2xl border border-dashed border-slate-700">
+        <div class="glass-panel p-3.5 rounded-2xl border border-dashed border-slate-700/80">
           <div class="flex items-center justify-between">
             <div>
               <span class="block text-xs font-bold text-slate-200">لوگو یا آیکون اختصاصی</span>
               <span class="block text-[11px] text-slate-400 mt-0.5">بدون کاهش خوانایی و افت کیفیت</span>
             </div>
             <div class="flex items-center gap-2">
-              <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-600 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 active:scale-95">
+              <label class="cursor-pointer bg-slate-800/90 hover:bg-slate-700 text-cyan-300 border border-cyan-500/20 px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 active:scale-95 shadow-sm">
                 <span>انتخاب لوگو</span>
                 <input type="file" id="logo-input" accept="image/*" class="hidden" />
               </label>
-              <button id="remove-logo" class="hidden text-xs bg-rose-950/60 border border-rose-800 text-rose-400 px-2.5 py-1.5 rounded-xl hover:bg-rose-900 transition">
+              <button id="remove-logo" class="hidden text-xs bg-rose-950/40 border border-rose-800/60 text-rose-400 px-3 py-1.5 rounded-xl hover:bg-rose-900/60 transition active:scale-95">
                 حذف
               </button>
             </div>
@@ -334,13 +355,13 @@
       <div class="lg:col-span-5 flex flex-col items-center justify-between border-t lg:border-t-0 lg:border-r border-slate-800/80 pt-6 lg:pt-0 lg:pr-6">
         
         <div class="w-full flex flex-col items-center">
-          <div class="flex items-center justify-between w-full max-w-[270px] mb-3">
+          <div class="flex items-center justify-between w-full max-w-[280px] mb-3 px-1">
             <span class="text-xs font-bold text-slate-400">پیش‌نمایش زنده</span>
-            <span class="text-[10px] bg-slate-800 text-cyan-300 px-2 py-0.5 rounded-full font-mono">Ultra Crisp</span>
+            <span class="text-[10px] bg-cyan-950/80 border border-cyan-800/50 text-cyan-300 px-2.5 py-0.5 rounded-full font-mono font-bold">Ultra Crisp</span>
           </div>
 
           <!-- QR Canvas Container -->
-          <div class="p-3 bg-slate-800/50 rounded-3xl shadow-2xl flex items-center justify-center max-w-[270px] w-full aspect-square border border-slate-700/50 transition-all duration-300 overflow-hidden" id="canvas-container">
+          <div class="p-3 bg-slate-900/90 rounded-3xl glow-cyan flex items-center justify-center max-w-[280px] w-full aspect-square border border-slate-700/60 transition-all duration-300 overflow-hidden" id="canvas-container">
             <!-- QR Generated Here -->
           </div>
         </div>
@@ -348,15 +369,15 @@
         <!-- Download & Actions -->
         <div class="w-full mt-6 space-y-3">
           <div class="flex gap-2">
-            <button id="btn-png" class="flex-1 py-3 bg-gradient-to-r from-cyan-400 to-sky-500 hover:from-cyan-300 hover:to-sky-400 text-slate-950 font-black rounded-xl shadow-lg shadow-cyan-500/20 active:scale-95 transition text-xs sm:text-sm flex items-center justify-center gap-1">
+            <button id="btn-png" class="flex-1 py-3.5 bg-gradient-to-r from-cyan-400 to-sky-500 hover:from-cyan-300 hover:to-sky-400 text-slate-950 font-black rounded-xl shadow-lg shadow-cyan-500/25 active:scale-95 transition text-xs sm:text-sm flex items-center justify-center gap-1.5">
               <span>دانلود باکیفیت (PNG)</span>
             </button>
-            <button id="btn-svg" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl border border-slate-700 active:scale-95 transition text-xs sm:text-sm flex items-center justify-center gap-1">
+            <button id="btn-svg" class="flex-1 py-3.5 bg-slate-800/90 hover:bg-slate-700 text-slate-100 font-bold rounded-xl border border-slate-700/80 active:scale-95 transition text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md">
               <span>وکتور (SVG)</span>
             </button>
           </div>
           
-          <button id="btn-copy" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 rounded-xl text-xs font-semibold transition active:scale-95">
+          <button id="btn-copy" class="w-full py-2.5 bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 rounded-xl text-xs font-semibold transition active:scale-95">
             📋 کپی رشته استاندارد QR در حافظه
           </button>
         </div>
@@ -495,9 +516,9 @@
     tabButtons.forEach(btn => {
       btn.addEventListener("click", () => {
         tabButtons.forEach(b => {
-          b.className = "tab-btn bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 flex flex-col items-center justify-center p-2.5 rounded-2xl font-semibold text-xs transition";
+          b.className = "tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200";
         });
-        btn.className = "tab-btn active bg-cyan-500 text-slate-950 flex flex-col items-center justify-center p-2.5 rounded-2xl border border-cyan-400/50 shadow-lg shadow-cyan-500/10 font-bold text-xs transition";
+        btn.className = "tab-btn active bg-cyan-500 text-slate-950 flex flex-col items-center justify-center p-2.5 rounded-xl border border-cyan-300/40 shadow-lg shadow-cyan-500/20 font-bold text-xs transition duration-200";
         
         activeType = btn.getAttribute("data-type");
         document.querySelectorAll(".type-form").forEach(f => f.classList.add("hidden"));
