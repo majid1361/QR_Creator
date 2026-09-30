@@ -10,7 +10,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="QR Studio" />
-  <link rel="manifest" href="manifest.json" />
   
   <!-- CDN Scripts -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -29,6 +28,7 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
+    /* Glass Effect Utilities */
     .glass-card {
       background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(16px);
@@ -44,14 +44,34 @@
     .glow-cyan {
       box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.25);
     }
-
-    #canvas-container canvas, #canvas-container svg {
-      max-width: 100% !important;
-      height: auto !important;
-      display: block;
-      border-radius: 1rem;
-    }
   </style>
+
+  <!-- Manifest Auto-Inject for PWA -->
+  <script>
+    const manifestJSON = {
+      name: "QR Code Studio Pro",
+      short_name: "QR Studio",
+      start_url: "./",
+      display: "standalone",
+      background_color: "#020617",
+      theme_color: "#020617",
+      icons: [
+        {
+          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2306b6d4'/><path d='M25 25h20v20h-20zM55 25h20v20h-20zM25 55h20v20h-20zM55 55h10v10h-10zM65 65h10v10h-10z' fill='%23020617'/></svg>",
+          sizes: "192x192 512x512",
+          type: "image/svg+xml",
+          purpose: "any maskable"
+        }
+      ]
+    };
+    const stringManifest = JSON.stringify(manifestJSON);
+    const blob = new Blob([stringManifest], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(blob);
+    const linkTag = document.createElement('link');
+    linkTag.rel = 'manifest';
+    linkTag.href = manifestURL;
+    document.head.appendChild(linkTag);
+  </script>
 </head>
 
 <body class="text-slate-100 min-h-screen p-3 sm:p-6 md:p-8 flex flex-col items-center justify-start antialiased selection:bg-cyan-500 selection:text-black">
@@ -79,7 +99,7 @@
     <header class="text-center space-y-1.5 relative">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[11px] font-semibold">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        پشتیبانی کامل از زبان فارسی و UTF-8 استاندارد
+        پشتیبانی هوشمند از انواع فرمت‌ها، حساب بانکی و حاشیه امن
       </div>
       <h1 class="text-2xl sm:text-4xl font-black bg-gradient-to-r from-white via-cyan-200 to-cyan-400 bg-clip-text text-transparent tracking-tight">
         استودیو همه‌کاره QR کد
@@ -102,7 +122,7 @@
         </div>
       </button>
 
-      <!-- Dropdown Items Menu -->
+      <!-- Dropdown Items Menu (Floating) -->
       <div id="dropdown-menu" class="hidden absolute top-full right-0 left-0 mt-2 glass-panel border border-slate-700/80 rounded-2xl p-2 shadow-2xl z-40 max-h-80 overflow-y-auto backdrop-blur-2xl grid grid-cols-1 sm:grid-cols-2 gap-1.5">
         
         <button data-type="url" data-icon="🔗" data-title="وب‌سایت و لینک اینترنتی" class="dropdown-item w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-cyan-500/10 hover:border-cyan-500/30 border border-transparent text-right transition">
@@ -208,7 +228,7 @@
           <!-- 1. URL -->
           <div id="form-url" class="type-form space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">آدرس وب‌سایت یا لینک اینترنتی</label>
-            <input type="text" id="input-url" placeholder="https://example.com" value="" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-xs sm:text-sm transition" />
+            <input type="text" id="input-url" placeholder="https://example.com" value="https://github.com" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-xs sm:text-sm transition" />
           </div>
 
           <!-- 2. BANK -->
@@ -465,29 +485,6 @@
     let logoDataUrl = "";
     let deferredPrompt = null;
 
-    function escapeWifi(str) {
-      return String(str || "").replace(/([\\;,:"])/g, "\\$1");
-    }
-
-    function escapeVCard(str) {
-      return String(str || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
-    }
-
-    function escapeICal(str) {
-      return String(str || "").replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
-    }
-
-    function formatISODate(dtValue) {
-      if (!dtValue) return "";
-      try {
-        const d = new Date(dtValue);
-        if (isNaN(d.getTime())) return "";
-        return d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-      } catch (e) {
-        return "";
-      }
-    }
-
     // PWA Install Prompt
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -526,11 +523,13 @@
       }
     });
 
+    // Close Dropdown on outer click
     document.addEventListener("click", () => {
       dropdownMenu.classList.add("hidden");
       dropdownArrow.style.transform = "rotate(0deg)";
     });
 
+    // Dropdown items click
     const dropdownItems = document.querySelectorAll(".dropdown-item");
     dropdownItems.forEach(item => {
       item.addEventListener("click", () => {
@@ -541,10 +540,12 @@
         selectedIcon.textContent = icon;
         selectedLabel.textContent = title;
 
+        // Hide all forms and show active one
         document.querySelectorAll(".type-form").forEach(f => f.classList.add("hidden"));
         const targetForm = document.getElementById(`form-${activeType}`);
         if (targetForm) targetForm.classList.remove("hidden");
 
+        // Close dropdown
         dropdownMenu.classList.add("hidden");
         dropdownArrow.style.transform = "rotate(0deg)";
 
@@ -552,24 +553,17 @@
       });
     });
 
-    // Extract Raw Payload accurately
+    // Format Generator for Standards (WiFi, SMS, vCard, Bank, etc.)
     function getFormattedPayload() {
       switch(activeType) {
-        case "url": {
-          let url = (document.getElementById("input-url").value || "").trim();
-          if (!url) return " ";
-          if (!/^https?:\/\//i.test(url) && !url.startsWith("mailto:") && !url.startsWith("tel:")) {
-            url = "https://" + url;
-          }
-          return url;
-        }
-
-        case "bank": {
-          const bHolder = (document.getElementById("bank-holder").value || "").trim();
-          const bBank = (document.getElementById("bank-name").value || "").trim();
-          const bCard = (document.getElementById("bank-card").value || "").trim();
-          const bAcc = (document.getElementById("bank-acc").value || "").trim();
-          let bIban = (document.getElementById("bank-iban").value || "").trim().toUpperCase();
+        case "url":
+          return document.getElementById("input-url").value.trim() || "https://github.com";
+        case "bank":
+          const bHolder = document.getElementById("bank-holder").value.trim();
+          const bBank = document.getElementById("bank-name").value.trim();
+          const bCard = document.getElementById("bank-card").value.trim();
+          const bAcc = document.getElementById("bank-acc").value.trim();
+          let bIban = document.getElementById("bank-iban").value.trim().toUpperCase();
           if (bIban && !bIban.startsWith("IR")) {
             bIban = "IR" + bIban;
           }
@@ -581,125 +575,61 @@
           if (bAcc) bankLines.push(`شماره حساب:\n${bAcc}`);
           if (bIban) bankLines.push(`شماره شبا:\n${bIban}`);
 
-          return bankLines.length > 0 ? bankLines.join("\n\n") : " ";
-        }
-
+          return bankLines.length > 0 ? bankLines.join("\n\n") : "اطلاعات حساب بانکی";
         case "text":
-          return (document.getElementById("input-text").value || "").trim() || " ";
-
-        case "wifi": {
-          const ssid = escapeWifi(document.getElementById("wifi-ssid").value.trim());
-          const pass = escapeWifi(document.getElementById("wifi-pass").value.trim());
-          const encChecked = document.querySelector('input[name="wifi-type"]:checked');
-          const enc = encChecked ? encChecked.value : "WPA";
-          if (!ssid) return " ";
-          if (enc === "nopass") {
-            return `WIFI:T:nopass;S:${ssid};;`;
-          }
+          return document.getElementById("input-text").value.trim() || " ";
+        case "wifi":
+          const ssid = document.getElementById("wifi-ssid").value.trim();
+          const pass = document.getElementById("wifi-pass").value.trim();
+          const enc = document.querySelector('input[name="wifi-type"]:checked').value;
           return `WIFI:T:${enc};S:${ssid};P:${pass};;`;
-        }
-
-        case "phone": {
-          const tel = (document.getElementById("input-phone").value || "").trim();
-          return tel ? `tel:${tel}` : " ";
-        }
-
-        case "sms": {
-          const smsNum = (document.getElementById("sms-phone").value || "").trim();
-          const smsBody = (document.getElementById("sms-body").value || "").trim();
-          return smsNum ? `SMSTO:${smsNum}:${smsBody}` : " ";
-        }
-
-        case "email": {
-          const to = (document.getElementById("email-to").value || "").trim();
-          const sub = encodeURIComponent((document.getElementById("email-subject").value || "").trim());
-          const body = encodeURIComponent((document.getElementById("email-body").value || "").trim());
-          return to ? `mailto:${to}?subject=${sub}&body=${body}` : " ";
-        }
-
-        case "vcard": {
-          const fn = escapeVCard((document.getElementById("vcard-fn").value || "").trim());
-          const vtel = escapeVCard((document.اره حساب:\n${bAcc}`);
-          if (bIban) bankLines.push(`شماره شبا:\n${bIban}`);
-
-          return bankLines.length > 0 ? bankLines.join("\n\n") : " ";
-        }
-
-        case "text":
-          return (document.getElementById("input-text").value || "").trim() || " ";
-
-        case "wifi": {
-          const ssid = escapeWifi(document.getElementById("wifi-ssid").value.trim());
-          const pass = escapeWifi(document.getElementById("wifi-pass").value.trim());
-          const encChecked = document.querySelector('input[name="wifi-type"]:checked');
-          const enc = encChecked ? encChecked.value : "WPA";
-          if (!ssid) return " ";
-          if (enc === "nopass") {
-            return `WIFI:T:nopass;S:${ssid};;`;
-          }
-          return `WIFI:T:${enc};S:${ssid};P:${pass};;`;
-        }
-
-        case "phone": {
-          const tel = (document.getElementById("input-phone").value || "").trim();
-          return tel ? `tel:${tel}` : " ";
-        }
-
-        case "sms": {
-          const smsNum = (document.getElementById("sms-phone").value || "").trim();
-          const smsBody = (document.getElementById("sms-body").value || "").trim();
-          return smsNum ? `SMSTO:${smsNum}:${smsBody}` : " ";
-        }
-
-        case "email": {
-          const to = (document.getElementById("email-to").value || "").trim();
-          const sub = encodeURIComponent((document.getElementById("email-subject").value || "").trim());
-          const body = encodeURIComponent((document.getElementById("email-body").value || "").trim());
-          return to ? `mailto:${to}?subject=${sub}&body=${body}` : " ";
-        }
-
-        case "vcard": {
-          const fn = escapeVCard((document.getElementById("vcard-fn").value || "").trim());
-          const vtel = escapeVCard((document.:${title}\r\n`;
-          if (start) ical += `DTSTART:${start}\r\n`;
-          if (end) ical += `DTEND:${end}\r\n`;
-          if (eloc) ical += `LOCATION;CHARSET=UTF-8:${eloc}\r\n`;
-          ical += "END:VEVENT\r\nEND:VCALENDAR";
-          return ical;
-        }
-
-        case "crypto": {
+        case "phone":
+          const tel = document.getElementById("input-phone").value.trim();
+          return `tel:${tel}`;
+        case "sms":
+          const smsNum = document.getElementById("sms-phone").value.trim();
+          const smsBody = document.getElementById("sms-body").value.trim();
+          return `SMSTO:${smsNum}:${smsBody}`;
+        case "email":
+          const to = document.getElementById("email-to").value.trim();
+          const sub = encodeURIComponent(document.getElementById("email-subject").value.trim());
+          const body = encodeURIComponent(document.getElementById("email-body").value.trim());
+          return `mailto:${to}?subject=${sub}&body=${body}`;
+        case "vcard":
+          const fn = document.getElementById("vcard-fn").value.trim();
+          const vtel = document.getElementById("vcard-tel").value.trim();
+          const vemail = document.getElementById("vcard-email").value.trim();
+          const vorg = document.getElementById("vcard-org").value.trim();
+          return `BEGIN:VCARD\nVERSION:3.0\nFN:${fn}\nORG:${vorg}\nTEL:${vtel}\nEMAIL:${vemail}\nEND:VCARD`;
+        case "location":
+          const lat = document.getElementById("loc-lat").value.trim() || "35.6892";
+          const lng = document.getElementById("loc-lng").value.trim() || "51.3890";
+          return `https://www.google.com/maps?q=${lat},${lng}`;
+        case "event":
+          const title = document.getElementById("event-title").value.trim() || "Event";
+          const start = (document.getElementById("event-start").value || "").replace(/[-:]/g, "") + "00Z";
+          const end = (document.getElementById("event-end").value || "").replace(/[-:]/g, "") + "00Z";
+          const eloc = document.getElementById("event-location").value.trim();
+          return `BEGIN:VEVENT\nSUMMARY:${title}\nDTSTART:${start}\nDTEND:${end}\nLOCATION:${eloc}\nEND:VEVENT`;
+        case "crypto":
           const coin = document.getElementById("crypto-coin").value;
-          const addr = (document.getElementById("crypto-address").value || "").trim();
-          const amt = (document.getElementById("crypto-amount").value || "").trim();
-          if (!addr) return " ";
+          const addr = document.getElementById("crypto-address").value.trim();
+          const amt = document.getElementById("crypto-amount").value.trim();
           if (coin === "bitcoin") return `bitcoin:${addr}${amt ? '?amount='+amt : ''}`;
           if (coin === "ethereum") return `ethereum:${addr}${amt ? '?value='+amt : ''}`;
           return `${coin}:${addr}${amt ? '?amount='+amt : ''}`;
-        }
-
         default:
-          return " ";
+          return "https://github.com";
       }
     }
 
-    function getSelectedMargin() {
-      const marginEl = document.getElementById("qr-margin");
-      if (!marginEl) return 25;
-      const parsed = parseInt(marginEl.value, 10);
-      return isNaN(parsed) ? 25 : parsed;
-    }
-
-    // Initialize Engine
+    // Initialize QR Code Styling Engine
     const qrCode = new QRCodeStyling({
-      width: 230,
-      height: 230,
-      margin: getSelectedMargin(),
+      width: 240,
+      height: 240,
+      margin: parseInt(document.getElementById("qr-margin").value) || 25,
       type: "canvas",
       data: getFormattedPayload(),
-      qrOptions: {
-        errorCorrectionLevel: "Q"
-      },
       dotsOptions: {
         color: document.getElementById("qr-color").value,
         type: document.getElementById("dots-type").value
@@ -721,44 +651,43 @@
     qrCode.append(container);
 
     function updateQR() {
-      try {
-        qrCode.update({
-          data: getFormattedPayload(),
-          margin: getSelectedMargin(),
-          dotsOptions: {
-            color: document.getElementById("qr-color").value,
-            type: document.getElementById("dots-type").value
-          },
-          backgroundOptions: {
-            color: document.getElementById("bg-color").value
-          },
-          cornersSquareOptions: {
-            type: document.getElementById("corners-type").value
-          },
-          image: logoDataUrl || null
-        });
-      } catch (err) {
-        console.warn("QR Render Error:", err);
-      }
+      const payload = getFormattedPayload();
+      const marginVal = parseInt(document.getElementById("qr-margin").value) || 0;
+      
+      qrCode.update({
+        data: payload,
+        margin: marginVal,
+        dotsOptions: {
+          color: document.getElementById("qr-color").value,
+          type: document.getElementById("dots-type").value
+        },
+        backgroundOptions: {
+          color: document.getElementById("bg-color").value
+        },
+        cornersSquareOptions: {
+          type: document.getElementById("corners-type").value
+        },
+        image: logoDataUrl || null
+      });
     }
 
-    // Event Listeners
+    // Inputs Listeners
     document.querySelectorAll("input, select, textarea").forEach(input => {
       input.addEventListener("input", updateQR);
       input.addEventListener("change", updateQR);
     });
 
     document.getElementById("qr-color").addEventListener("input", (e) => {
-      document.getElementById("qr-color-val").textContent = e.target.value.toUpperCase();
+      document.getElementById("qr-color-val").textContent = e.target.value;
       updateQR();
     });
 
     document.getElementById("bg-color").addEventListener("input", (e) => {
-      document.getElementById("bg-color-val").textContent = e.target.value.toUpperCase();
+      document.getElementById("bg-color-val").textContent = e.target.value;
       updateQR();
     });
 
-    // Logo Handlers
+    // Logo Upload / Remove
     document.getElementById("logo-input").addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -779,10 +708,10 @@
       updateQR();
     });
 
-    // Export Options
+    // High Resolution Exports
     document.getElementById("btn-png").addEventListener("click", () => {
-      const targetSize = parseInt(document.getElementById("qr-size").value, 10) || 2000;
-      const baseMargin = getSelectedMargin();
+      const targetSize = parseInt(document.getElementById("qr-size").value) || 2000;
+      const baseMargin = parseInt(document.getElementById("qr-margin").value) || 25;
       const exportMargin = Math.round(baseMargin * (targetSize / 240));
 
       const downloadQr = new QRCodeStyling({
@@ -790,9 +719,6 @@
         height: targetSize,
         margin: exportMargin,
         data: getFormattedPayload(),
-        qrOptions: {
-          errorCorrectionLevel: "Q"
-        },
         dotsOptions: {
           color: document.getElementById("qr-color").value,
           type: document.getElementById("dots-type").value
@@ -818,46 +744,25 @@
       qrCode.download({ name: `qr-${activeType}-vector`, extension: "svg" });
     });
 
-    // Copy Content Button
-    document.getElementById("btn-copy").addEventListener("click", async () => {
+    // Copy Raw QR String
+    document.getElementById("btn-copy").addEventListener("click", () => {
       const payload = getFormattedPayload();
-      const btn = document.getElementById("btn-copy");
-
-      const showSuccess = () => {
+      navigator.clipboard.writeText(payload).then(() => {
+        const btn = document.getElementById("btn-copy");
         btn.textContent = "✅ در حافظه کپی شد!";
         setTimeout(() => {
           btn.textContent = "📋 کپی متن/محتوای QR";
         }, 2000);
-      };
-
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(payload);
-          showSuccess();
-        } else {
-          const textArea = document.createElement("textarea");
-          textArea.value = payload;
-          textArea.style.position = "fixed";
-          textArea.style.left = "-999999px";
-          textArea.style.top = "-999999px";
-          document.body.appendChild(textArea);
-          textArea.focus();
-          textArea.select();
-          document.execCommand('copy');
-          textArea.remove();
-          showSuccess();
-        }
-      } catch (err) {
-        alert("خطا در کپی خودکار، لطفاً دستی کپی کنید.");
-      }
+      });
     });
 
-    // PWA Service Worker Registration
+    // Service Worker for Offline / PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js', { scope: './' }).catch((err) => {
-          console.log('SW registration skipped in local mode.');
-        });
+        const swBlob = new Blob([
+          `self.addEventListener('fetch', function(e) { e.respondWith(fetch(e.request).catch(function() { return caches.match(e.request); })); });`
+        ], { type: 'application/javascript' });
+        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
       });
     }
   </script>
