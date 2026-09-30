@@ -57,7 +57,7 @@
       theme_color: "#020617",
       icons: [
         {
-          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2306b6d4'/><path d='M25 25h20v20h-20zM55 25h20v20h-20zM25 55h20v20h-20zM55 55h10v10h-10zM65 65h10v10h-10z' fill='%23020617'/></svg>",
+          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2306b6d4'/><path d='M25 25h20v20h-20zM55 25h20v20h-20zM25 55h20v20h-20zM55 55h10v10h-10z' fill='%23020617'/></svg>",
           sizes: "192x192 512x512",
           type: "image/svg+xml",
           purpose: "any maskable"
@@ -99,7 +99,7 @@
     <header class="text-center space-y-1.5 relative">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[11px] font-semibold">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        پشتیبانی هوشمند از انواع فرمت‌ها، حساب بانکی و حاشیه امن
+        پشتیبانی هوشمند از لینک مستقیم نقشه و انواع فرمت‌ها
       </div>
       <h1 class="text-2xl sm:text-4xl font-black bg-gradient-to-r from-white via-cyan-200 to-cyan-400 bg-clip-text text-transparent tracking-tight">
         استودیو همه‌کاره QR کد
@@ -111,9 +111,9 @@
       <label class="block text-xs font-bold text-slate-400 mb-1.5 mr-1">نوع بارکد QR مورد نظر:</label>
       <button id="dropdown-toggle" type="button" class="w-full glass-card hover:border-cyan-500/50 rounded-2xl p-3 px-4 flex items-center justify-between text-slate-100 shadow-xl transition active:scale-[0.99] border border-slate-700/60">
         <div class="flex items-center gap-3">
-          <span id="selected-icon" class="text-xl">🔗</span>
+          <span id="selected-icon" class="text-xl">📍</span>
           <div class="text-right">
-            <span id="selected-label" class="font-bold text-sm sm:text-base text-cyan-300">وب‌سایت و لینک اینترنتی</span>
+            <span id="selected-label" class="font-bold text-sm sm:text-base text-cyan-300">موقعیت جغرافیایی و نقشه</span>
             <span class="text-[10px] text-slate-400 block sm:inline sm:mr-2">برای تغییر نوع کلیک کنید</span>
           </div>
         </div>
@@ -125,6 +125,14 @@
       <!-- Dropdown Items Menu (Floating) -->
       <div id="dropdown-menu" class="hidden absolute top-full right-0 left-0 mt-2 glass-panel border border-slate-700/80 rounded-2xl p-2 shadow-2xl z-40 max-h-80 overflow-y-auto backdrop-blur-2xl grid grid-cols-1 sm:grid-cols-2 gap-1.5">
         
+        <button data-type="location" data-icon="📍" data-title="موقعیت جغرافیایی و نقشه" class="dropdown-item w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-cyan-500/10 hover:border-cyan-500/30 border border-transparent text-right transition">
+          <span class="text-xl">📍</span>
+          <div>
+            <div class="text-xs font-bold text-slate-100">لوکیشن و نقشه (Map)</div>
+            <div class="text-[10px] text-slate-400">لینک گوگل‌مپ، نشان، بلد یا مختصات</div>
+          </div>
+        </button>
+
         <button data-type="url" data-icon="🔗" data-title="وب‌سایت و لینک اینترنتی" class="dropdown-item w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-cyan-500/10 hover:border-cyan-500/30 border border-transparent text-right transition">
           <span class="text-xl">🔗</span>
           <div>
@@ -189,14 +197,6 @@
           </div>
         </button>
 
-        <button data-type="location" data-icon="📍" data-title="موقعیت جغرافیایی نقشه" class="dropdown-item w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-cyan-500/10 hover:border-cyan-500/30 border border-transparent text-right transition">
-          <span class="text-xl">📍</span>
-          <div>
-            <div class="text-xs font-bold text-slate-100">لوکیشن (Map)</div>
-            <div class="text-[10px] text-slate-400">مسیریابی با نقشه</div>
-          </div>
-        </button>
-
         <button data-type="event" data-icon="📅" data-title="ثبت رویداد در تقویم" class="dropdown-item w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-cyan-500/10 hover:border-cyan-500/30 border border-transparent text-right transition">
           <span class="text-xl">📅</span>
           <div>
@@ -225,22 +225,34 @@
         <!-- Dynamic Forms Container -->
         <div class="glass-panel p-4 rounded-2xl border border-slate-800/80 shadow-inner">
           
-          <!-- 1. URL -->
-          <div id="form-url" class="type-form space-y-2.5">
+          <!-- 1. LOCATION (Active by Default) -->
+          <div id="form-location" class="type-form space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-300">لینک موقعیت نقشه یا مسیریابی</label>
+              <span class="text-[10px] text-cyan-400">گوگل‌مپ، بلد، نشان یا مختصات</span>
+            </div>
+            <input type="text" id="loc-link" placeholder="https://maps.app.goo.gl/... یا https://neshan.org/..." value="https://maps.google.com/?q=35.6892,51.3890" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-xs sm:text-sm transition" />
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              💡 <b>روش استفاده:</b> در برنامه گوگل‌مپ یا بلد، روی دکمه Share (اشتراک‌گذاری) بزنید و لینک کپی شده را اینجا پیست کنید.
+            </p>
+          </div>
+
+          <!-- 2. URL -->
+          <div id="form-url" class="type-form hidden space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">آدرس وب‌سایت یا لینک اینترنتی</label>
             <input type="text" id="input-url" placeholder="https://example.com" value="https://github.com" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-xs sm:text-sm transition" />
           </div>
 
-          <!-- 2. BANK -->
+          <!-- 3. BANK -->
           <div id="form-bank" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">اطلاعات حساب بانکی و کارت</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <input type="text" id="bank-holder" placeholder="نام و نام خانوادگی صاحب حساب" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
-              <input type="text" id="bank-name" placeholder="نام بانک (مثلاً ملت، سامان...)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
+              <input type="text" id="bank-holder" placeholder="نام صاحب حساب" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
+              <input type="text" id="bank-name" placeholder="نام بانک (ملت، سامان...)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
             </div>
             <div class="space-y-2">
               <div>
-                <label class="text-[11px] text-slate-400 block mb-1">شماره کارت (۱۶ رقمی):</label>
+                <label class="text-[11px] text-slate-400 block mb-1">شماره کارت (۱۶ رقم):</label>
                 <input type="text" id="bank-card" placeholder="6037-xxxx-xxxx-xxxx" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-left text-xs sm:text-sm transition tracking-wider" />
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -256,13 +268,13 @@
             </div>
           </div>
 
-          <!-- 3. TEXT -->
+          <!-- 4. TEXT -->
           <div id="form-text" class="type-form hidden space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">متن دلخواه یا توضیحات</label>
             <textarea id="input-text" rows="3" placeholder="متن مورد نظرتان را اینجا بنویسید..." class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition"></textarea>
           </div>
 
-          <!-- 4. WIFI -->
+          <!-- 5. WIFI -->
           <div id="form-wifi" class="type-form hidden space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">مشخصات شبکه وای‌فای</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -286,20 +298,20 @@
             </div>
           </div>
 
-          <!-- 5. PHONE -->
+          <!-- 6. PHONE -->
           <div id="form-phone" class="type-form hidden space-y-2.5">
-            <label class="block text-xs font-bold text-slate-300">شماره تماس جهت شماره‌گیری مستقیم</label>
+            <label class="block text-xs font-bold text-slate-300">شماره تماس مستقیم</label>
             <input type="tel" id="input-phone" placeholder="0912xxxxxxx" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
           </div>
 
-          <!-- 6. SMS -->
+          <!-- 7. SMS -->
           <div id="form-sms" class="type-form hidden space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">ارسال پیامک آماده</label>
             <input type="tel" id="sms-phone" placeholder="شماره گیرنده" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm mb-1.5 transition" />
             <textarea id="sms-body" rows="2" placeholder="متن پیش‌فرض پیامک..." class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition"></textarea>
           </div>
 
-          <!-- 7. EMAIL -->
+          <!-- 8. EMAIL -->
           <div id="form-email" class="type-form hidden space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">ارسال ایمیل</label>
             <input type="email" id="email-to" placeholder="آدرس ایمیل گیرنده" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
@@ -307,23 +319,14 @@
             <textarea id="email-body" rows="2" placeholder="متن پیام..." class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition"></textarea>
           </div>
 
-          <!-- 8. VCARD / CONTACT -->
+          <!-- 9. VCARD -->
           <div id="form-vcard" class="type-form hidden space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">کارت ویزیت مخاطب (vCard)</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <input type="text" id="vcard-fn" placeholder="نام و نام خانوادگی" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
               <input type="tel" id="vcard-tel" placeholder="شماره تماس" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
               <input type="email" id="vcard-email" placeholder="ایمیل" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left text-xs sm:text-sm transition" />
-              <input type="text" id="vcard-org" placeholder="نام شرکت / شغل" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
-            </div>
-          </div>
-
-          <!-- 9. LOCATION -->
-          <div id="form-location" class="type-form hidden space-y-2.5">
-            <label class="block text-xs font-bold text-slate-300">مختصات نقشه</label>
-            <div class="grid grid-cols-2 gap-2.5">
-              <input type="number" step="any" id="loc-lat" placeholder="عرض (Lat) 35.6892" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-xs sm:text-sm transition" />
-              <input type="number" step="any" id="loc-lng" placeholder="طول (Lng) 51.3890" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-xs sm:text-sm transition" />
+              <input type="text" id="vcard-org" placeholder="نام شرکت یا برند" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
             </div>
           </div>
 
@@ -346,13 +349,13 @@
 
           <!-- 11. CRYPTO -->
           <div id="form-crypto" class="type-form hidden space-y-2.5">
-            <label class="block text-xs font-bold text-slate-300">درگاه پرداخت و والت رمزارز</label>
+            <label class="block text-xs font-bold text-slate-300">درگاه والت ارز دیجیتال</label>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               <select id="crypto-coin" class="w-full px-3 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition">
-                <option value="bitcoin">Bitcoin (BTC)</option>
-                <option value="ethereum">Ethereum (ETH)</option>
-                <option value="tether">Tether (USDT-TRC20)</option>
-                <option value="tron">Tron (TRX)</option>
+                <option value="bitcoin">Bitcoin</option>
+                <option value="ethereum">Ethereum</option>
+                <option value="tether">Tether USDT</option>
+                <option value="tron">TRON</option>
               </select>
               <input type="text" id="crypto-address" placeholder="آدرس والت (Address)" class="sm:col-span-2 w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-left text-xs transition" />
             </div>
@@ -365,21 +368,21 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-1.5">طرح نقطه‌ها (Dots)</label>
-            <select id="dots-type" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700/70 rounded-xl text-slate-200 text-xs sm:text-sm transition">
+            <select id="dots-type" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700/70 rounded-xl text-slate-200 text-xs transition">
               <option value="rounded" selected>مدرن و گرد (Rounded)</option>
               <option value="dots">دایره کامل (Dots)</option>
               <option value="classy">زاویه‌دار (Classy)</option>
               <option value="extra-rounded">فوق‌گرد (Extra-rounded)</option>
-              <option value="square">مربعی کلاسیک (Square)</option>
+              <option value="square">مربعی (Square)</option>
             </select>
           </div>
 
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-1.5">طرح گوشه‌ها (Corners)</label>
-            <select id="corners-type" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700/70 rounded-xl text-slate-200 text-xs sm:text-sm transition">
-              <option value="extra-rounded" selected>گوشه‌های کاملاً گرد</option>
+            <select id="corners-type" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700/70 rounded-xl text-slate-200 text-xs transition">
+              <option value="extra-rounded" selected>گوشه‌های گرد</option>
               <option value="dot">دایره‌ای (Dot)</option>
-              <option value="square">مربعی استاندارد</option>
+              <option value="square">مربعی</option>
             </select>
           </div>
         </div>
@@ -388,20 +391,20 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-1.5">حاشیه امن (Quiet Zone)</label>
-            <select id="qr-margin" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700/70 rounded-xl text-slate-200 text-xs sm:text-sm transition">
-              <option value="15">حاشیه ملایم (15px)</option>
-              <option value="25" selected>حاشیه استاندارد چاپ (25px)</option>
-              <option value="35">حاشیه عریض (35px)</option>
-              <option value="0">بدون حاشیه (0px)</option>
+            <select id="qr-margin" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700/70 rounded-xl text-slate-200 text-xs transition">
+              <option value="15">حاشیه کم (15px)</option>
+              <option value="25" selected>حاشیه چاپ استاندارد (25px)</option>
+              <option value="35">حاشیه باز (35px)</option>
+              <option value="0">بدون حاشیه</option>
             </select>
           </div>
 
           <div>
             <label class="block text-xs font-bold text-slate-300 mb-1.5">کیفیت خروجی (رزولوشن)</label>
-            <select id="qr-size" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700/70 rounded-xl text-slate-200 text-xs sm:text-sm transition">
-              <option value="1200">مناسب وب - 1200px</option>
-              <option value="2000" selected>فوق شفاف چاپ - 2000px</option>
-              <option value="3000">اولترا HD بنر - 3000px</option>
+            <select id="qr-size" class="w-full px-3 py-2 bg-slate-900/80 border border-slate-700/70 rounded-xl text-slate-200 text-xs transition">
+              <option value="1200">مناسب وب (1200px)</option>
+              <option value="2000" selected>کیفیت فوق‌العاده چاپ (2000px)</option>
+              <option value="3000">کیفیت بنر و تابلو (3000px)</option>
             </select>
           </div>
         </div>
@@ -428,12 +431,12 @@
         <!-- Center Logo Upload -->
         <div class="glass-panel p-3 rounded-2xl border border-dashed border-slate-700/80 flex items-center justify-between">
           <div>
-            <span class="block text-xs font-bold text-slate-200">لوگو یا آیکون اختصاصی</span>
-            <span class="block text-[10px] text-slate-400">بدون کاهش خوانایی</span>
+            <span class="block text-xs font-bold text-slate-200">لوگو یا آیکون دلخواه</span>
+            <span class="block text-[10px] text-slate-400">بدون کاهش اسکن</span>
           </div>
           <div class="flex items-center gap-2">
             <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/20 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 active:scale-95 shadow-sm">
-              <span>انتخاب لوگو</span>
+              <span>انتخاب عکس</span>
               <input type="file" id="logo-input" accept="image/*" class="hidden" />
             </label>
             <button id="remove-logo" class="hidden text-xs bg-rose-950/40 border border-rose-800/60 text-rose-400 px-2.5 py-1.5 rounded-xl hover:bg-rose-900/60 transition active:scale-95">
@@ -462,45 +465,33 @@
         <!-- Download & Actions -->
         <div class="w-full mt-5 space-y-2.5">
           <div class="flex gap-2">
-            <button id="btn-png" class="flex-1 py-3 bg-gradient-to-r from-cyan-400 to-sky-500 hover:from-cyan-300 hover:to-sky-400 text-slate-950 font-black rounded-xl shadow-lg shadow-cyan-500/25 active:scale-95 transition text-xs sm:text-sm flex items-center justify-center gap-1">
-              <span>دانلود (PNG)</span>
-            </button>
-            <button id="btn-svg" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-xl border border-slate-700/80 active:scale-95 transition text-xs sm:text-sm flex items-center justify-center gap-1">
-              <span>وکتور (SVG)</span>
+            <button id="btn-png" class="flex-1 py-3 bg-gradient-to-r from-rose-400 px-2.5 py-1.5 rounded-xl hover:bg-rose-900/60 transition active:scale-95">
+              حذف
             </button>
           </div>
-          
-          <button id="btn-copy" class="w-full py-2 bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 rounded-xl text-xs font-semibold transition active:scale-95">
-            📋 کپی متن/محتوای QR
-          </button>
         </div>
 
       </div>
 
-    </div>
-  </div>
+      <!-- Live Preview & Output (Column 2) -->
+      <div class="lg:col-span-5 flex flex-col items-center justify-between border-t lg:border-t-0 lg:border-r border-slate-800/80 pt-5 lg:pt-0 lg:pr-5">
+        
+        <div class="w-full flex flex-col items-center">
+          <div class="flex items-center justify-between w-full max-w-[260px] mb-2 px-1">
+            <span class="text-xs font-bold text-slate-400">پیش‌نمایش زنده</span>
+            <span class="text-[10px] bg-cyan-950/80 border border-cyan-800/50 text-cyan-300 px-2 py-0.5 rounded-full font-mono font-bold">Ultra Crisp</span>
+          </div>
 
-  <script>
-    let activeType = "url";
-    let logoDataUrl = "";
-    let deferredPrompt = null;
+          <!-- QR Canvas Container -->
+          <div class="p-3 bg-slate-900/90 rounded-3xl glow-cyan flex items-center justify-center max-w-[260px] w-full aspect-square border border-slate-700/60 transition-all duration-300 overflow-hidden" id="canvas-container">
+            <!-- QR Generated Here -->
+          </div>
+        </div>
 
-    // PWA Install Prompt
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const banner = document.getElementById('install-banner');
-      if (banner) banner.classList.remove('hidden');
-    });
-
-    document.getElementById('btn-install').addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          document.getElementById('install-banner').classList.add('hidden');
-        }
-        deferredPrompt = null;
+        <!-- Download & Actions -->
+        <div class="w-full mt-5 space-y-2.5">
+          <div class="flex gap-2">
+            <button id="btn-png" class="flex-1 py-3 bg-gradient-to-r from-cyan-400 to-sky-500 hover:from-cyan-300 hover:to null;
       }
     });
 
@@ -553,9 +544,17 @@
       });
     });
 
-    // Format Generator for Standards (WiFi, SMS, vCard, Bank, etc.)
+    // Format Generator for Standards (WiFi, SMS, vCard, Bank, Location, etc.)
     function getFormattedPayload() {
       switch(activeType) {
+        case "location":
+          let loc = document.getElementById("loc-link").value.trim();
+          if (!loc) return "https://maps.google.com/?q=35.6892,51.3890";
+          // If user entered only numbers e.g. "35.6892, 51.3890" convert to maps url
+          if (/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/.test(loc)) {
+            return `https://maps.google.com/?q=${loc.replace(/\s+/g, '')}`;
+          }
+          return loc;
         case "url":
           return document.getElementById("input-url").value.trim() || "https://github.com";
         case "bank":
@@ -601,10 +600,6 @@
           const vemail = document.getElementById("vcard-email").value.trim();
           const vorg = document.getElementById("vcard-org").value.trim();
           return `BEGIN:VCARD\nVERSION:3.0\nFN:${fn}\nORG:${vorg}\nTEL:${vtel}\nEMAIL:${vemail}\nEND:VCARD`;
-        case "location":
-          const lat = document.getElementById("loc-lat").value.trim() || "35.6892";
-          const lng = document.getElementById("loc-lng").value.trim() || "51.3890";
-          return `https://www.google.com/maps?q=${lat},${lng}`;
         case "event":
           const title = document.getElementById("event-title").value.trim() || "Event";
           const start = (document.getElementById("event-start").value || "").replace(/[-:]/g, "") + "00Z";
@@ -749,9 +744,9 @@
       const payload = getFormattedPayload();
       navigator.clipboard.writeText(payload).then(() => {
         const btn = document.getElementById("btn-copy");
-        btn.textContent = "✅ در حافظه کپی شد!";
+        btn.textContent = "✅ کپی شد!";
         setTimeout(() => {
-          btn.textContent = "📋 کپی متن/محتوای QR";
+          btn.textContent = "📋 کپی لینک/متن بارکد";
         }, 2000);
       });
     });
