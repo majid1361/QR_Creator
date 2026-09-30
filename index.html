@@ -86,7 +86,7 @@
       </h1>
     </header>
 
-    <!-- Dropdown for Categories -->
+    <!-- Sleek Compact Dropdown for Categories -->
     <div class="relative z-30" id="type-dropdown-container">
       <label class="block text-xs font-bold text-slate-400 mb-1.5 mr-1">نوع بارکد QR مورد نظر:</label>
       <button id="dropdown-toggle" type="button" class="w-full glass-card hover:border-cyan-500/50 rounded-2xl p-3 px-4 flex items-center justify-between text-slate-100 shadow-xl transition active:scale-[0.99] border border-slate-700/60">
@@ -208,7 +208,7 @@
           <!-- 1. URL -->
           <div id="form-url" class="type-form space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">آدرس وب‌سایت یا لینک اینترنتی</label>
-            <input type="text" id="input-url" placeholder="https://example.com" value="https://google.com" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-xs sm:text-sm transition" />
+            <input type="text" id="input-url" placeholder="https://example.com" value="" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-xs sm:text-sm transition" />
           </div>
 
           <!-- 2. BANK -->
@@ -238,7 +238,7 @@
 
           <!-- 3. TEXT -->
           <div id="form-text" class="type-form hidden space-y-2.5">
-            <label class="block text-xs font-bold text-slate-300">متن دلخواه یا یادداشت فارسی</label>
+            <label class="block text-xs font-bold text-slate-300">متن دلخواه یا توضیحات</label>
             <textarea id="input-text" rows="3" placeholder="متن مورد نظرتان را اینجا بنویسید..." class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition"></textarea>
           </div>
 
@@ -289,12 +289,12 @@
 
           <!-- 8. VCARD / CONTACT -->
           <div id="form-vcard" class="type-form hidden space-y-2.5">
-            <label class="block text-xs font-bold text-slate-300">کارت ویزیت مخاطب (vCard با پشتیبانی فارسی)</label>
+            <label class="block text-xs font-bold text-slate-300">کارت ویزیت مخاطب (vCard)</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <input type="text" id="vcard-fn" placeholder="نام و نام خانوادگی" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
               <input type="tel" id="vcard-tel" placeholder="شماره تماس" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
               <input type="email" id="vcard-email" placeholder="ایمیل" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left text-xs sm:text-sm transition" />
-              <input type="text" id="vcard-org" placeholder="نام شرکت / سازمان" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
+              <input type="text" id="vcard-org" placeholder="نام شرکت / شغل" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
             </div>
           </div>
 
@@ -465,12 +465,6 @@
     let logoDataUrl = "";
     let deferredPrompt = null;
 
-    // Fix UTF-8 Encoding for accurate rendering across all mobile scanners
-    function toUTF8(str) {
-      if (!str) return "";
-      return unescape(encodeURIComponent(str));
-    }
-
     function escapeWifi(str) {
       return String(str || "").replace(/([\\;,:"])/g, "\\$1");
     }
@@ -532,13 +526,11 @@
       }
     });
 
-    // Close Dropdown on outer click
     document.addEventListener("click", () => {
       dropdownMenu.classList.add("hidden");
       dropdownArrow.style.transform = "rotate(0deg)";
     });
 
-    // Dropdown items click
     const dropdownItems = document.querySelectorAll(".dropdown-item");
     dropdownItems.forEach(item => {
       item.addEventListener("click", () => {
@@ -549,7 +541,6 @@
         selectedIcon.textContent = icon;
         selectedLabel.textContent = title;
 
-        // Hide all forms and show active one
         document.querySelectorAll(".type-form").forEach(f => f.classList.add("hidden"));
         const targetForm = document.getElementById(`form-${activeType}`);
         if (targetForm) targetForm.classList.remove("hidden");
@@ -561,12 +552,12 @@
       });
     });
 
-    // Generate Standard Raw Content
-    function getRawPayload() {
+    // Extract Raw Payload accurately
+    function getFormattedPayload() {
       switch(activeType) {
         case "url": {
           let url = (document.getElementById("input-url").value || "").trim();
-          if (!url) return "https://google.com";
+          if (!url) return " ";
           if (!/^https?:\/\//i.test(url) && !url.startsWith("mailto:") && !url.startsWith("tel:")) {
             url = "https://" + url;
           }
@@ -590,7 +581,7 @@
           if (bAcc) bankLines.push(`شماره حساب:\n${bAcc}`);
           if (bIban) bankLines.push(`شماره شبا:\n${bIban}`);
 
-          return bankLines.length > 0 ? bankLines.join("\n\n") : "اطلاعات حساب بانکی";
+          return bankLines.length > 0 ? bankLines.join("\n\n") : " ";
         }
 
         case "text":
@@ -601,6 +592,7 @@
           const pass = escapeWifi(document.getElementById("wifi-pass").value.trim());
           const encChecked = document.querySelector('input[name="wifi-type"]:checked');
           const enc = encChecked ? encChecked.value : "WPA";
+          if (!ssid) return " ";
           if (enc === "nopass") {
             return `WIFI:T:nopass;S:${ssid};;`;
           }
@@ -609,54 +601,66 @@
 
         case "phone": {
           const tel = (document.getElementById("input-phone").value || "").trim();
-          return `tel:${tel}`;
+          return tel ? `tel:${tel}` : " ";
         }
 
         case "sms": {
           const smsNum = (document.getElementById("sms-phone").value || "").trim();
           const smsBody = (document.getElementById("sms-body").value || "").trim();
-          return `SMSTO:${smsNum}:${smsBody}`;
+          return smsNum ? `SMSTO:${smsNum}:${smsBody}` : " ";
         }
 
         case "email": {
           const to = (document.getElementById("email-to").value || "").trim();
           const sub = encodeURIComponent((document.getElementById("email-subject").value || "").trim());
           const body = encodeURIComponent((document.getElementById("email-body").value || "").trim());
-          return `mailto:${to}?subject=${sub}&body=${body}`;
+          return to ? `mailto:${to}?subject=${sub}&body=${body}` : " ";
         }
 
         case "vcard": {
           const fn = escapeVCard((document.getElementById("vcard-fn").value || "").trim());
-          const vtel = escapeVCard((document.getElementById("vcard-tel").value || "").trim());
-          const vemail = escapeVCard((document.getElementById("vcard-email").value || "").trim());
-          const vorg = escapeVCard((document.getElementById("vcard-org").value || "").trim());
-          
-          let vcardLines = ["BEGIN:VCARD", "VERSION:3.0"];
-          if (fn) vcardLines.push(`FN;CHARSET=UTF-8:${fn}`);
-          if (vorg) vcardLines.push(`ORG;CHARSET=UTF-8:${vorg}`);
-          if (vtel) vcardLines.push(`TEL;TYPE=CELL:${vtel}`);
-          if (vemail) vcardLines.push(`EMAIL:${vemail}`);
-          vcardLines.push("END:VCARD");
-          
-          return vcardLines.join("\r\n");
+          const vtel = escapeVCard((document.اره حساب:\n${bAcc}`);
+          if (bIban) bankLines.push(`شماره شبا:\n${bIban}`);
+
+          return bankLines.length > 0 ? bankLines.join("\n\n") : " ";
         }
 
-        case "location": {
-          const lat = (document.getElementById("loc-lat").value || "").trim() || "35.6892";
-          const lng = (document.getElementById("loc-lng").value || "").trim() || "51.3890";
-          return `https://www.google.com/maps?q=${lat},${lng}`;
+        case "text":
+          return (document.getElementById("input-text").value || "").trim() || " ";
+
+        case "wifi": {
+          const ssid = escapeWifi(document.getElementById("wifi-ssid").value.trim());
+          const pass = escapeWifi(document.getElementById("wifi-pass").value.trim());
+          const encChecked = document.querySelector('input[name="wifi-type"]:checked');
+          const enc = encChecked ? encChecked.value : "WPA";
+          if (!ssid) return " ";
+          if (enc === "nopass") {
+            return `WIFI:T:nopass;S:${ssid};;`;
+          }
+          return `WIFI:T:${enc};S:${ssid};P:${pass};;`;
         }
 
-        case "event": {
-          const title = escapeICal((document.getElementById("event-title").value || "").trim() || "رویداد");
-          const startVal = document.getElementById("event-start").value;
-          const endVal = document.getElementById("event-end").value;
-          const start = formatISODate(startVal);
-          const end = formatISODate(endVal);
-          const eloc = escapeICal((document.getElementById("event-location").value || "").trim());
+        case "phone": {
+          const tel = (document.getElementById("input-phone").value || "").trim();
+          return tel ? `tel:${tel}` : " ";
+        }
 
-          let ical = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\n";
-          ical += `SUMMARY;CHARSET=UTF-8:${title}\r\n`;
+        case "sms": {
+          const smsNum = (document.getElementById("sms-phone").value || "").trim();
+          const smsBody = (document.getElementById("sms-body").value || "").trim();
+          return smsNum ? `SMSTO:${smsNum}:${smsBody}` : " ";
+        }
+
+        case "email": {
+          const to = (document.getElementById("email-to").value || "").trim();
+          const sub = encodeURIComponent((document.getElementById("email-subject").value || "").trim());
+          const body = encodeURIComponent((document.getElementById("email-body").value || "").trim());
+          return to ? `mailto:${to}?subject=${sub}&body=${body}` : " ";
+        }
+
+        case "vcard": {
+          const fn = escapeVCard((document.getElementById("vcard-fn").value || "").trim());
+          const vtel = escapeVCard((document.:${title}\r\n`;
           if (start) ical += `DTSTART:${start}\r\n`;
           if (end) ical += `DTEND:${end}\r\n`;
           if (eloc) ical += `LOCATION;CHARSET=UTF-8:${eloc}\r\n`;
@@ -668,20 +672,15 @@
           const coin = document.getElementById("crypto-coin").value;
           const addr = (document.getElementById("crypto-address").value || "").trim();
           const amt = (document.getElementById("crypto-amount").value || "").trim();
+          if (!addr) return " ";
           if (coin === "bitcoin") return `bitcoin:${addr}${amt ? '?amount='+amt : ''}`;
           if (coin === "ethereum") return `ethereum:${addr}${amt ? '?value='+amt : ''}`;
           return `${coin}:${addr}${amt ? '?amount='+amt : ''}`;
         }
 
         default:
-          return "https://google.com";
+          return " ";
       }
-    }
-
-    // Get Payload prepared for QR Code Styling
-    function getQrPayload() {
-      const raw = getRawPayload();
-      return toUTF8(raw);
     }
 
     function getSelectedMargin() {
@@ -691,13 +690,13 @@
       return isNaN(parsed) ? 25 : parsed;
     }
 
-    // Initialize QR Code Styling Engine
+    // Initialize Engine
     const qrCode = new QRCodeStyling({
       width: 230,
       height: 230,
       margin: getSelectedMargin(),
       type: "canvas",
-      data: getQrPayload(),
+      data: getFormattedPayload(),
       qrOptions: {
         errorCorrectionLevel: "Q"
       },
@@ -724,7 +723,7 @@
     function updateQR() {
       try {
         qrCode.update({
-          data: getQrPayload(),
+          data: getFormattedPayload(),
           margin: getSelectedMargin(),
           dotsOptions: {
             color: document.getElementById("qr-color").value,
@@ -739,11 +738,11 @@
           image: logoDataUrl || null
         });
       } catch (err) {
-        console.warn("QR Render Warning:", err);
+        console.warn("QR Render Error:", err);
       }
     }
 
-    // Inputs Listeners
+    // Event Listeners
     document.querySelectorAll("input, select, textarea").forEach(input => {
       input.addEventListener("input", updateQR);
       input.addEventListener("change", updateQR);
@@ -759,73 +758,69 @@
       updateQR();
     });
 
-    // Logo Upload / Remove
+    // Logo Handlers
     document.getElementById("logo-input").addEventListener("change", (e) => {
       const file = e.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {
-          logoDataUrl =color: document.getElementById("bg-color").value,
-      },
-      cornersSquareOptions: {
-        type: document.getElementById("corners-type").value
-      },
-      imageOptions: {
-        crossOrigin: "anonymous",
-        margin: 4,
-        imageSize: 0.35
+          logoDataUrl = reader.result;
+          document.getElementById("remove-logo").classList.remove("hidden");
+          updateQR();
+        };
+        reader.readAsDataURL(file);
       }
     });
 
-    const container = document.getElementById("canvas-container");
-    qrCode.append(container);
-
-    function updateQR() {
-      try {
-        qrCode.update({
-          data: getQrPayload(),
-          margin: getSelectedMargin(),
-          dotsOptions: {
-            color: document.getElementById("qr-color").value,
-            type: document.getElementById("dots-type").value
-          },
-          backgroundOptions: {
-            color: document.getElementById("bg-color").value
-          },
-          cornersSquareOptions: {
-            type: document.getElementById("corners-type").value
-          },
-          image: logoDataUrl || null
-        });
-      } catch (err) {
-        console.warn("QR Render Warning:", err);
-      }
-    }
-
-    // Inputs Listeners
-    document.querySelectorAll("input, select, textarea").forEach(input => {
-      input.addEventListener("input", updateQR);
-      input.addEventListener("change", updateQR);
-    });
-
-    document.getElementById("qr-color").addEventListener("input", (e) => {
-      document.getElementById("qr-color-val").textContent = e.target.value.toUpperCase();
+    document.getElementById("remove-logo").addEventListener("click", () => {
+      logoDataUrl = "";
+      document.getElementById("logo-input").value = "";
+      document.getElementById("remove-logo").classList.add("hidden");
       updateQR();
     });
 
-    document.getElementById("bg-color").addEventListener("input", (e) => {
-      document.getElementById("bg-color-val").textContent = e.target.value.toUpperCase();
-      updateQR();
+    // Export Options
+    document.getElementById("btn-png").addEventListener("click", () => {
+      const targetSize = parseInt(document.getElementById("qr-size").value, 10) || 2000;
+      const baseMargin = getSelectedMargin();
+      const exportMargin = Math.round(baseMargin * (targetSize / 240));
+
+      const downloadQr = new QRCodeStyling({
+        width: targetSize,
+        height: targetSize,
+        margin: exportMargin,
+        data: getFormattedPayload(),
+        qrOptions: {
+          errorCorrectionLevel: "Q"
+        },
+        dotsOptions: {
+          color: document.getElementById("qr-color").value,
+          type: document.getElementById("dots-type").value
+        },
+        backgroundOptions: {
+          color: document.getElementById("bg-color").value
+        },
+        cornersSquareOptions: {
+          type: document.getElementById("corners-type").value
+        },
+        image: logoDataUrl || null,
+        imageOptions: {
+          crossOrigin: "anonymous",
+          margin: 6,
+          imageSize: 0.35
+        }
+      });
+
+      downloadQr.download({ name: `qr-${activeType}-hq`, extension: "png" });
     });
 
-    // Logo Upload / Remove
-    document.getElementById("logo-input").addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          logoDataUrl = {
-      const payload = getRawPayload();
+    document.getElementById("btn-svg").addEventListener("click", () => {
+      qrCode.download({ name: `qr-${activeType}-vector`, extension: "svg" });
+    });
+
+    // Copy Content Button
+    document.getElementById("btn-copy").addEventListener("click", async () => {
+      const payload = getFormattedPayload();
       const btn = document.getElementById("btn-copy");
 
       const showSuccess = () => {
@@ -857,7 +852,7 @@
       }
     });
 
-    // Standard PWA Service Worker Registration
+    // PWA Service Worker Registration
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js', { scope: './' }).catch((err) => {
