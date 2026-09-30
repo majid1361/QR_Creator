@@ -29,7 +29,6 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* Glass Effect Utilities */
     .glass-card {
       background: rgba(15, 23, 42, 0.65);
       backdrop-filter: blur(16px);
@@ -80,14 +79,14 @@
     <header class="text-center space-y-1.5 relative">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[11px] font-semibold">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        پشتیبانی هوشمند از انواع فرمت‌ها، حساب بانکی و حاشیه امن
+        پشتیبانی کامل از زبان فارسی و UTF-8 استاندارد
       </div>
       <h1 class="text-2xl sm:text-4xl font-black bg-gradient-to-r from-white via-cyan-200 to-cyan-400 bg-clip-text text-transparent tracking-tight">
         استودیو همه‌کاره QR کد
       </h1>
     </header>
 
-    <!-- Sleek Compact Dropdown for Categories -->
+    <!-- Dropdown for Categories -->
     <div class="relative z-30" id="type-dropdown-container">
       <label class="block text-xs font-bold text-slate-400 mb-1.5 mr-1">نوع بارکد QR مورد نظر:</label>
       <button id="dropdown-toggle" type="button" class="w-full glass-card hover:border-cyan-500/50 rounded-2xl p-3 px-4 flex items-center justify-between text-slate-100 shadow-xl transition active:scale-[0.99] border border-slate-700/60">
@@ -103,7 +102,7 @@
         </div>
       </button>
 
-      <!-- Dropdown Items Menu (Floating) -->
+      <!-- Dropdown Items Menu -->
       <div id="dropdown-menu" class="hidden absolute top-full right-0 left-0 mt-2 glass-panel border border-slate-700/80 rounded-2xl p-2 shadow-2xl z-40 max-h-80 overflow-y-auto backdrop-blur-2xl grid grid-cols-1 sm:grid-cols-2 gap-1.5">
         
         <button data-type="url" data-icon="🔗" data-title="وب‌سایت و لینک اینترنتی" class="dropdown-item w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-cyan-500/10 hover:border-cyan-500/30 border border-transparent text-right transition">
@@ -209,7 +208,7 @@
           <!-- 1. URL -->
           <div id="form-url" class="type-form space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">آدرس وب‌سایت یا لینک اینترنتی</label>
-            <input type="text" id="input-url" placeholder="https://example.com" value="https://github.com" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-xs sm:text-sm transition" />
+            <input type="text" id="input-url" placeholder="https://example.com" value="https://google.com" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-xs sm:text-sm transition" />
           </div>
 
           <!-- 2. BANK -->
@@ -239,7 +238,7 @@
 
           <!-- 3. TEXT -->
           <div id="form-text" class="type-form hidden space-y-2.5">
-            <label class="block text-xs font-bold text-slate-300">متن دلخواه یا توضیحات</label>
+            <label class="block text-xs font-bold text-slate-300">متن دلخواه یا یادداشت فارسی</label>
             <textarea id="input-text" rows="3" placeholder="متن مورد نظرتان را اینجا بنویسید..." class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition"></textarea>
           </div>
 
@@ -290,12 +289,12 @@
 
           <!-- 8. VCARD / CONTACT -->
           <div id="form-vcard" class="type-form hidden space-y-2.5">
-            <label class="block text-xs font-bold text-slate-300">کارت ویزیت مخاطب (vCard)</label>
+            <label class="block text-xs font-bold text-slate-300">کارت ویزیت مخاطب (vCard با پشتیبانی فارسی)</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <input type="text" id="vcard-fn" placeholder="نام و نام خانوادگی" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
               <input type="tel" id="vcard-tel" placeholder="شماره تماس" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
               <input type="email" id="vcard-email" placeholder="ایمیل" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left text-xs sm:text-sm transition" />
-              <input type="text" id="vcard-org" placeholder="نام شرکت / شغل" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
+              <input type="text" id="vcard-org" placeholder="نام شرکت / سازمان" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
             </div>
           </div>
 
@@ -466,7 +465,12 @@
     let logoDataUrl = "";
     let deferredPrompt = null;
 
-    // Helper: Escape Special Characters for Standards
+    // Fix UTF-8 Encoding for accurate rendering across all mobile scanners
+    function toUTF8(str) {
+      if (!str) return "";
+      return unescape(encodeURIComponent(str));
+    }
+
     function escapeWifi(str) {
       return String(str || "").replace(/([\\;,:"])/g, "\\$1");
     }
@@ -550,7 +554,6 @@
         const targetForm = document.getElementById(`form-${activeType}`);
         if (targetForm) targetForm.classList.remove("hidden");
 
-        // Close dropdown
         dropdownMenu.classList.add("hidden");
         dropdownArrow.style.transform = "rotate(0deg)";
 
@@ -558,12 +561,12 @@
       });
     });
 
-    // Format Generator for Standards (WiFi, SMS, vCard, Bank, etc.)
-    function getFormattedPayload() {
+    // Generate Standard Raw Content
+    function getRawPayload() {
       switch(activeType) {
         case "url": {
           let url = (document.getElementById("input-url").value || "").trim();
-          if (!url) return "https://github.com";
+          if (!url) return "https://google.com";
           if (!/^https?:\/\//i.test(url) && !url.startsWith("mailto:") && !url.startsWith("tel:")) {
             url = "https://" + url;
           }
@@ -627,7 +630,15 @@
           const vtel = escapeVCard((document.getElementById("vcard-tel").value || "").trim());
           const vemail = escapeVCard((document.getElementById("vcard-email").value || "").trim());
           const vorg = escapeVCard((document.getElementById("vcard-org").value || "").trim());
-          return `BEGIN:VCARD\r\nVERSION:3.0\r\nFN:${fn}\r\nORG:${vorg}\r\nTEL:${vtel}\r\nEMAIL:${vemail}\r\nEND:VCARD`;
+          
+          let vcardLines = ["BEGIN:VCARD", "VERSION:3.0"];
+          if (fn) vcardLines.push(`FN;CHARSET=UTF-8:${fn}`);
+          if (vorg) vcardLines.push(`ORG;CHARSET=UTF-8:${vorg}`);
+          if (vtel) vcardLines.push(`TEL;TYPE=CELL:${vtel}`);
+          if (vemail) vcardLines.push(`EMAIL:${vemail}`);
+          vcardLines.push("END:VCARD");
+          
+          return vcardLines.join("\r\n");
         }
 
         case "location": {
@@ -645,10 +656,10 @@
           const eloc = escapeICal((document.getElementById("event-location").value || "").trim());
 
           let ical = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\n";
-          ical += `SUMMARY:${title}\r\n`;
+          ical += `SUMMARY;CHARSET=UTF-8:${title}\r\n`;
           if (start) ical += `DTSTART:${start}\r\n`;
           if (end) ical += `DTEND:${end}\r\n`;
-          if (eloc) ical += `LOCATION:${eloc}\r\n`;
+          if (eloc) ical += `LOCATION;CHARSET=UTF-8:${eloc}\r\n`;
           ical += "END:VEVENT\r\nEND:VCALENDAR";
           return ical;
         }
@@ -663,11 +674,16 @@
         }
 
         default:
-          return "https://github.com";
+          return "https://google.com";
       }
     }
 
-    // Helper: Parse Margins Accurately
+    // Get Payload prepared for QR Code Styling
+    function getQrPayload() {
+      const raw = getRawPayload();
+      return toUTF8(raw);
+    }
+
     function getSelectedMargin() {
       const marginEl = document.getElementById("qr-margin");
       if (!marginEl) return 25;
@@ -681,7 +697,10 @@
       height: 230,
       margin: getSelectedMargin(),
       type: "canvas",
-      data: getFormattedPayload(),
+      data: getQrPayload(),
+      qrOptions: {
+        errorCorrectionLevel: "Q"
+      },
       dotsOptions: {
         color: document.getElementById("qr-color").value,
         type: document.getElementById("dots-type").value
@@ -704,9 +723,8 @@
 
     function updateQR() {
       try {
-        const payload = getFormattedPayload();
         qrCode.update({
-          data: payload,
+          data: getQrPayload(),
           margin: getSelectedMargin(),
           dotsOptions: {
             color: document.getElementById("qr-color").value,
@@ -721,7 +739,7 @@
           image: logoDataUrl || null
         });
       } catch (err) {
-        console.warn("QR Render Warning / Overflow:", err);
+        console.warn("QR Render Warning:", err);
       }
     }
 
@@ -747,60 +765,67 @@
       if (file) {
         const reader = new FileReader();
         reader.onload = () => {
-          logoDataUrl = reader.result;
-          document.getElementById("remove-logo").classList.remove("hidden");
-          updateQR();
-        };
-        reader.readAsDataURL(file);
+          logoDataUrl =color: document.getElementById("bg-color").value,
+      },
+      cornersSquareOptions: {
+        type: document.getElementById("corners-type").value
+      },
+      imageOptions: {
+        crossOrigin: "anonymous",
+        margin: 4,
+        imageSize: 0.35
       }
     });
 
-    document.getElementById("remove-logo").addEventListener("click", () => {
-      logoDataUrl = "";
-      document.getElementById("logo-input").value = "";
-      document.getElementById("remove-logo").classList.add("hidden");
+    const container = document.getElementById("canvas-container");
+    qrCode.append(container);
+
+    function updateQR() {
+      try {
+        qrCode.update({
+          data: getQrPayload(),
+          margin: getSelectedMargin(),
+          dotsOptions: {
+            color: document.getElementById("qr-color").value,
+            type: document.getElementById("dots-type").value
+          },
+          backgroundOptions: {
+            color: document.getElementById("bg-color").value
+          },
+          cornersSquareOptions: {
+            type: document.getElementById("corners-type").value
+          },
+          image: logoDataUrl || null
+        });
+      } catch (err) {
+        console.warn("QR Render Warning:", err);
+      }
+    }
+
+    // Inputs Listeners
+    document.querySelectorAll("input, select, textarea").forEach(input => {
+      input.addEventListener("input", updateQR);
+      input.addEventListener("change", updateQR);
+    });
+
+    document.getElementById("qr-color").addEventListener("input", (e) => {
+      document.getElementById("qr-color-val").textContent = e.target.value.toUpperCase();
       updateQR();
     });
 
-    // High Resolution Exports
-    document.getElementById("btn-png").addEventListener("click", () => {
-      const targetSize = parseInt(document.getElementById("qr-size").value, 10) || 2000;
-      const baseMargin = getSelectedMargin();
-      const exportMargin = Math.round(baseMargin * (targetSize / 240));
-
-      const downloadQr = new QRCodeStyling({
-        width: targetSize,
-        height: targetSize,
-        margin: exportMargin,
-        data: getFormattedPayload(),
-        dotsOptions: {
-          color: document.getElementById("qr-color").value,
-          type: document.getElementById("dots-type").value
-        },
-        backgroundOptions: {
-          color: document.getElementById("bg-color").value
-        },
-        cornersSquareOptions: {
-          type: document.getElementById("corners-type").value
-        },
-        image: logoDataUrl || null,
-        imageOptions: {
-          crossOrigin: "anonymous",
-          margin: 6,
-          imageSize: 0.35
-        }
-      });
-
-      downloadQr.download({ name: `qr-${activeType}-hq`, extension: "png" });
+    document.getElementById("bg-color").addEventListener("input", (e) => {
+      document.getElementById("bg-color-val").textContent = e.target.value.toUpperCase();
+      updateQR();
     });
 
-    document.getElementById("btn-svg").addEventListener("click", () => {
-      qrCode.download({ name: `qr-${activeType}-vector`, extension: "svg" });
-    });
-
-    // Copy Raw QR String with Robust Fallback
-    document.getElementById("btn-copy").addEventListener("click", async () => {
-      const payload = getFormattedPayload();
+    // Logo Upload / Remove
+    document.getElementById("logo-input").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          logoDataUrl = {
+      const payload = getRawPayload();
       const btn = document.getElementById("btn-copy");
 
       const showSuccess = () => {
@@ -836,7 +861,7 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js', { scope: './' }).catch((err) => {
-          console.log('SW registration skipped or unsupported in local file mode.');
+          console.log('SW registration skipped in local mode.');
         });
       });
     }
