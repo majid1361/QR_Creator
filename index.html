@@ -74,30 +74,39 @@
   </script>
 </head>
 
+<body class="text-slate-100 min-h-screen p-3 sm:p-6 md:p-8 flex flex-col items-center justify-start antialiased selection:bg-cyan- manifestJSON = {
+      name: "QR Code Studio Pro",
+      short_name: "QR Studio",
+      start_url: "./",
+      display: "standalone",
+      background_color: "#020617",
+      theme_color: "#020617",
+      icons: [
+        {
+          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2306b6d4'/><path d='M25 25h20v20h-20zM55 25h20v20h-20zM25 55h20v20h-20zM55 55h10v10h-10zM65 65h10v10h-10z' fill='%23020617'/></svg>",
+          sizes: "192x192 512x512",
+          type: "image/svg+xml",
+          purpose: "any maskable"
+        }
+      ]
+    };
+    const stringManifest = JSON.stringify(manifestJSON);
+    const blob = new Blob([stringManifest], {type: 'application/json'});
+    const manifestURL = URL.createObjectURL(blob);
+    const linkTag = document.createElement('link');
+    linkTag.rel = 'manifest';
+    linkTag.href = manifestURL;
+    document.head.appendChild(linkTag);
+  </script>
+</head>
+
 <body class="text-slate-100 min-h-screen p-3 sm:p-6 md:p-8 flex flex-col items-center justify-start antialiased selection:bg-cyan-500 selection:text-black">
 
   <!-- Mobile Install Banner -->
   <div id="install-banner" class="hidden w-full max-w-5xl mb-5 glass-card border-cyan-500/30 rounded-2xl p-4 flex items-center justify-between shadow-2xl transition-all">
     <div class="flex items-center gap-3.5">
-      <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-xl shadow-inner">
-        📱
-      </div>
-      <div>
-        <p class="font-bold text-sm text-cyan-200">نصب نسخه اپلیکیشن روی گوشی</p>
-        <p class="text-xs text-slate-400 mt-0.5">سریع، آفلاین و بدون نیاز به استور</p>
-      </div>
-    </div>
-    <button id="btn-install" class="bg-gradient-to-r from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 active:scale-95 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs shadow-lg shadow-cyan-500/20 transition">
-      نصب روی موبایل
-    </button>
-  </div>
-
-  <div class="max-w-5xl w-full mx-auto space-y-6">
-    <!-- Header -->
-    <header class="text-center">
-      <div class="inline-flex items-center gap-2 px-3.5 py-1 bg-slate-900/80 border border-slate-700/50 rounded-full text-xs font-semibold text-cyan-400 mb-3 shadow-inner">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        پشتیبانی از انواع فرمت‌های هوشمند و حاشیه امن
+      <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border bg-emerald-400 animate-pulse"></span>
+        پشتیبانی از انواع فرمت‌های هوشمند، حساب بانکی و حاشیه امن
       </div>
       <h1 class="text-3xl sm:text-5xl font-black bg-gradient-to-r from-white via-cyan-200 to-cyan-400 bg-clip-text text-transparent tracking-tight">
         استودیو همه‌کاره QR کد
@@ -106,10 +115,14 @@
     </header>
 
     <!-- Category Selector (Grid/Tabs) -->
-    <div class="grid grid-cols-5 sm:grid-cols-5 md:grid-cols-10 gap-2 p-1.5 glass-card rounded-2xl" id="type-tabs">
+    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-11 gap-2 p-1.5 glass-card rounded-2xl" id="type-tabs">
       <button data-type="url" class="tab-btn active bg-cyan-500 text-slate-950 flex flex-col items-center justify-center p-2.5 rounded-xl border border-cyan-300/40 shadow-lg shadow-cyan-500/20 font-bold text-xs transition duration-200">
         <span class="text-lg mb-1">🔗</span>
         <span>وب‌سایت</span>
+      </button>
+      <button data-type="bank" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
+        <span class="text-lg mb-1">💳</span>
+        <span>حساب بانکی</span>
       </button>
       <button data-type="text" class="tab-btn bg-slate-900/40 text-slate-400 hover:text-slate-100 hover:bg-slate-800/60 border border-transparent flex flex-col items-center justify-center p-2.5 rounded-xl font-medium text-xs transition duration-200">
         <span class="text-lg mb-1">📝</span>
@@ -164,13 +177,46 @@
             <input type="text" id="input-url" placeholder="https://example.com" value="https://github.com" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white text-left font-mono text-sm transition" />
           </div>
 
-          <!-- 2. TEXT -->
+          <!-- 2. BANK (کارت و حساب بانکی) -->
+          <div id="form-bank" class="type-form hidden space-y-3">
+            <label class="block text-xs font-bold text-slate-300">اطلاعات حساب بانکی و کارت</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input type="text" id="bank-holder" placeholder="نام و نام خانوادگی صاحب حساب" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
+              <input type="text" id="bank-name" placeholder="نام بانک (مثلاً ملت، سامان...)" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
+            </div>
+            <div class="space-y-2.5">
+              <div>
+                <label class="text-[11px] text-slate-400 block mb-1">شماره کارت (۱۶ رقمی):</label>
+                <input type="text" id="bank-card" placeholder="6037-xxxx-xxxx-xxxx" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white font-mono text-left text-sm transition tracking-wider" />
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="text-[11px] text-slate-400 block mb-1">شماره حساب:</label>
+                  <input type="text" id="bank-acc" placeholder="شماره حساب" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white font-mono text-left text-sm transition" />
+                </div>
+                <div>
+                  <label class="text-[11px] text-slate-400 block mb-1">شماره شبا (IBAN):</label>
+                  <input type="text" id="bank-iban" placeholder="IR000000000000000000000000" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white font-mono text-left text-sm transition" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. TEXT -->
           <div id="form-text" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">متن دلخواه یا توضیحات</label>
             <textarea id="input-text" rows="3" placeholder="متن مورد نظرتان را اینجا بنویسید..." class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white text-sm transition"></textarea>
           </div>
 
-          <!-- 3. WIFI -->
+          <!-- 4. WIFI -->
+          <div id="form-wifi" class="type-form hidden space-y-3">
+            <label class="block text-xs font-bold text-slate-300">مشخصات شبکه وای‌فای (اتصال مستقیم گوشی)</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input type="text" id="wifi-ssid" placeholder="نام شبکه (SSID)" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-slate-300">متن دلخواه یا توضیحات</label>
+            <textarea id="input-text" rows="3" placeholder="متن مورد نظرتان را اینجا بنویسید..." class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 focus:outline-none text-white text-sm transition"></textarea>
+          </div>
+
+          <!-- 4. WIFI -->
           <div id="form-wifi" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">مشخصات شبکه وای‌فای (اتصال مستقیم گوشی)</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -180,31 +226,17 @@
             <div class="flex items-center gap-4 text-xs text-slate-300 pt-1">
               <span class="font-semibold text-slate-400">نوع امنیت:</span>
               <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="radio" name="wifi-type" value="WPA" checked class="text-cyan-500 focus:ring-0"> WPA/WPA2
-              </label>
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="radio" name="wifi-type" value="WEP" class="text-cyan-500 focus:ring-0"> WEP
-              </label>
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="radio" name="wifi-type" value="nopass" class="text-cyan-500 focus:ring-0"> بدون پسورد
-              </label>
-            </div>
+/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-sm transition" />
           </div>
 
-          <!-- 4. PHONE -->
-          <div id="form-phone" class="type-form hidden space-y-3">
-            <label class="block text-xs font-bold text-slate-300">شماره تلفن (تماس فوری)</label>
-            <input type="tel" id="input-phone" placeholder="09120000000 یا +989120000000" class="w-full px-4 py-3 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-sm transition" />
-          </div>
-
-          <!-- 5. SMS -->
+          <!-- 6. SMS -->
           <div id="form-sms" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">ارسال پیامک آماده</label>
             <input type="tel" id="sms-phone" placeholder="شماره گیرنده" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-sm mb-2 transition" />
             <textarea id="sms-body" rows="2" placeholder="متن پیش‌فرض پیامک..." class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition"></textarea>
           </div>
 
-          <!-- 6. EMAIL -->
+          <!-- 7. EMAIL -->
           <div id="form-email" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">ارسال ایمیل</label>
             <input type="email" id="email-to" placeholder="آدرس ایمیل گیرنده" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-sm transition" />
@@ -212,7 +244,7 @@
             <textarea id="email-body" rows="2" placeholder="متن پیام..." class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition"></textarea>
           </div>
 
-          <!-- 7. VCARD / CONTACT -->
+          <!-- 8. VCARD / CONTACT -->
           <div id="form-vcard" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">کارت ویزیت هوشمند (vCard مخاطب)</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -223,7 +255,7 @@
             </div>
           </div>
 
-          <!-- 8. LOCATION -->
+          <!-- 9. LOCATION -->
           <div id="form-location" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">مختصات نقشه (Google Maps Navigation)</label>
             <div class="grid grid-cols-2 gap-3">
@@ -232,7 +264,7 @@
             </div>
           </div>
 
-          <!-- 9. EVENT -->
+          <!-- 10. EVENT -->
           <div id="form-event" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">ثبت رویداد در تقویم (Calendar Event)</label>
             <input type="text" id="event-title" placeholder="عنوان رویداد یا جلسه" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
@@ -246,10 +278,10 @@
                 <input type="datetime-local" id="event-end" class="w-full px-3 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-xs transition" />
               </div>
             </div>
-            <input type="text" id="event-location" placeholder="محل برگزاری (اختیاری)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
+            <input type="text" id="event-location" placeholder="محل برگزاری (اختیاری)" class="w-full px-3 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-sm transition" />
           </div>
 
-          <!-- 10. CRYPTO -->
+          <!-- 11. CRYPTO -->
           <div id="form-crypto" class="type-form hidden space-y-3">
             <label class="block text-xs font-bold text-slate-300">درگاه پرداخت و کیف پول رمزارز</label>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -269,30 +301,25 @@
         <!-- Styles Selector -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
+            <label class="block text-xs font-bold text-slate-30)</option>
+                <option value="tron">Tron (TRX)</option>
+              </select>
+              <input type="text" id="crypto-address" placeholder="آدرس والت (Wallet Address)" class="sm:col-span-2 w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white font-mono text-left text-xs transition" />
+            </div>
+            <input type="number" step="any" id="crypto-amount" placeholder="مقدار پیش‌فرض (اختیاری)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white font-mono text-left text-xs transition" />
+          </div>
+
+        </div>
+
+        <!-- Styles Selector -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
             <label class="block text-xs font-bold text-slate-300 mb-2">طرح نقطه‌ها (Dots)</label>
             <select id="dots-type" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-slate-200 text-sm transition">
               <option value="rounded" selected>مدرن و گرد (Rounded)</option>
               <option value="dots">دایره کامل (Dots)</option>
               <option value="classy">زاویه‌دار کلاسیک (Classy)</option>
-              <option value="extra-rounded">فوق گرد (Smooth)</option>
-              <option value="square">مربعی استاندارد (Square)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-2">طرح گوشه‌ها (Corners)</label>
-            <select id="corners-type" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-slate-200 text-sm transition">
-              <option value="extra-rounded" selected>گوشه نیم‌گرد</option>
-              <option value="dot">گوشه دایره‌ای</option>
-              <option value="square">گوشه تیز هندسی</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Margin & Resolution -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-2">حاشیه سفید اطراف (Quiet Zone)</label>
+              <option value="extra-)</label>
             <select id="qr-margin" class="w-full px-3.5 py-2.5 bg-slate-900/80 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-slate-200 text-sm transition">
               <option value="15">حاشیه ملایم (15px)</option>
               <option value="25" selected>حاشیه استاندارد و چاپ (25px)</option>
@@ -411,11 +438,29 @@
       }
     });
 
-    // Format Generator for Standards (WiFi, SMS, vCard, etc.)
+    // Format Generator for Standards (WiFi, SMS, vCard, Bank, etc.)
     function getFormattedPayload() {
       switch(activeType) {
         case "url":
           return document.getElementById("input-url").value.trim() || "https://github.com";
+        case "bank":
+          const bHolder = document.getElementById("bank-holder").value.trim();
+          const bBank = document.getElementById("bank-name").value.trim();
+          const bCard = document.getElementById("bank-card").value.trim();
+          const bAcc = document.getElementById("bank-acc").value.trim();
+          let bIban = document.getElementById("bank-iban").value.trim().toUpperCase();
+          if (bIban && !bIban.startsWith("IR")) {
+            bIban = "IR" + bIban;
+          }
+
+          let bankLines = [];
+          if (bHolder) bankLines.push(`صاحب حساب: ${bHolder}`);
+          if (bBank) bankLines.push(`بانک: ${bBank}`);
+          if (bCard) bankLines.push(`شماره کارت:\n${bCard}`);
+          if (bAcc) bankLines.push(`شماره حساب:\n${bAcc}`);
+          if (bIban) bankLines.push(`شماره شبا:\n${bIban}`);
+
+          return bankLines.length > 0 ? bankLines.join("\n\n") : "اطلاعات حساب بانکی";
         case "text":
           return document.getElementById("input-text").value.trim() || " ";
         case "wifi":
@@ -607,7 +652,7 @@
       const payload = getFormattedPayload();
       navigator.clipboard.writeText(payload).then(() => {
         const btn = document.getElementById("btn-copy");
-        btn.textContent = "✅ متن/دستور استاندارد کپی شد!";
+        btn.textContent = "✅ اطلاعات حساب در حافظه کپی شد!";
         setTimeout(() => {
           btn.textContent = "📋 کپی رشته استاندارد QR در حافظه";
         }, 2000);
