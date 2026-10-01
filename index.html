@@ -70,7 +70,7 @@
     <header class="text-center space-y-1.5 relative">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[11px] font-semibold">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        پشتیبانی هوشمند از انواع فرمت‌ها، اطلاعات بانکی و حاشیه امن
+        پشتیبانی کامل از زبان فارسی و اعداد استاندارد
       </div>
       <h1 class="text-2xl sm:text-4xl font-black bg-gradient-to-r from-white via-cyan-200 to-cyan-400 bg-clip-text text-transparent tracking-tight">
         استودیو همه‌کاره QR کد
@@ -250,8 +250,8 @@
                 <input type="radio" name="wifi-type" value="WEP" class="text-cyan-500" />
                 <span>WEP</span>
               </label>
-              <label class="flex items-center gap-1 cursor-pointer">
-                <input type="radio" name="wifi-type" value="nopass" class="text-cyan-500" />
+ name="wifi-type" value="nopass" class="text-cyan-500" />
+                 name="wifi-type" value="nopass" class="text-cyan-500" />
                 <span>بدون رمز</span>
               </label>
             </div>
@@ -468,6 +468,16 @@
       return result;
     }
 
+    // تبدیل امن رشته‌های یونیکد و فارسی به بایت‌های سازگار با انجین QR
+    function encodeQrData(str) {
+      if (!str) return "";
+      try {
+        return unescape(encodeURIComponent(str));
+      } catch (e) {
+        return str;
+      }
+    }
+
     // PWA Install Prompt Handler
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -627,7 +637,7 @@
       height: 240,
       margin: parseInt(document.getElementById("qr-margin").value) || 25,
       type: "canvas",
-      data: getFormattedPayload(),
+      data: encodeQrData(getFormattedPayload()),
       qrOptions: {
         errorCorrectionLevel: 'Q'
       },
@@ -652,13 +662,65 @@
     qrCode.append(container);
 
     function updateQR() {
-      const payload = getFormattedPayload();
+      const rawPayload = getFormattedPayload();
       const marginVal = parseInt(document.getElementById("qr-margin").value) || 0;
       
       qrCode.update({
-        data: payload,
+        data: encodeQrData(rawPayload),
         margin: marginVal,
         dotsOptions: {
+          color: document.getElementById("qr-color").value,
+          type: document.getElementById("dots-type").value
+        },
+        backgroundOptions: {
+          color: document.getElementById("bg-color").value
+        },
+        cornersSquareOptions: {
+          type: document.getElementById("corners-type").value
+        },
+        image: logoDataUrl || null
+      });
+    }
+
+    // Inputs Listeners
+    document.querySelectorAll("input, select, textarea").forEach(input => {
+      input.addEventListener("input", updateQR);
+      input.addEventListener("change", updateQR);
+    });
+
+    document.getElementById("qr-color").addEventListener("input", (e) => {
+      document.getElementById("qr-color-val").textContent = e.target.value.toUpperCase();
+      updateQR();
+    });
+
+    document.getElementById("bg-color").addEventListener("input", (e) => {
+      document.getElementById("bg-color-val").textContent = e.target.value.toUpperCase();
+      updateQR();
+    });
+
+    // Logo Upload / Remove Logic
+    document.getElementById("logo-input").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          logoDataUrl = reader.result;
+          document.getElementById("remove-logo").classList.remove("hidden");
+          updateQR();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById("remove-logo").addEventListener("click", () => {
+      logoDataUrl = "";
+      document.getElementById("logo-input").value = "";
+      document.getElementById("remove-logo").classList.add("hidden");
+      updateQR();
+    });
+
+    // Guaranteed High-Resolution Downloads
+    dotsOptions: {
           color: document.getElementById("qr-color").value,
           type: document.getElementById("dots-type").value
         },
@@ -713,53 +775,7 @@
     document.getElementById("btn-png").addEventListener("click", async () => {
       const btn = document.getElementById("btn-png");
       const originalText = btn.innerHTML;
-      btn.innerText = "⏳ در حال آماده‌سازی...";
-      
-      try {
-        const targetSize = parseInt(document.getElementById("qr-size").value) || 2000;
-        const currentMargin = parseInt(document.getElementById("qr-margin").value) || 25;
-        const exportMargin = Math.round(currentMargin * (targetSize / 240));
-
-        // ارتقای سایز به رزولوشن بالا برای ذخیره‌سازی
-        await qrCode.update({
-          width: targetSize,
-          height: targetSize,
-          margin: exportMargin
-        });
-
-        await qrCode.download({ name: `qr-${activeType}-${Date.now()}`, extension: "png" });
-
-        // بازگردانی به اندازه پیش‌نمایش در صفحه
-        await qrCode.update({
-          width: 240,
-          height: 240,
-          margin: currentMargin
-        });
-      } catch (err) {
-        console.error("Download Error:", err);
-      } finally {
-        btn.innerHTML = originalText;
-      }
-    });
-
-    document.getElementById("btn-svg").addEventListener("click", async () => {
-      await qrCode.download({ name: `qr-${activeType}-${Date.now()}`, extension: "svg" });
-    });
-
-    // Copy Raw QR String
-    document.getElementById("btn-copy").addEventListener("click", () => {
-      const payload = getFormattedPayload();
-      navigator.clipboard.writeText(payload).then(() => {
-        const btn = document.getElementById("btn-copy");
-        btn.textContent = "✅ در حافظه کپی شد!";
-        setTimeout(() => {
-          btn.textContent = "📋 کپی متن/محتوای QR";
-        }, 2000);
-      });
-    });
-
-    // Offline Service Worker Registration
-    if ('serviceWorker' in navigator) {
+      btn.innerText = "⏳ در {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
