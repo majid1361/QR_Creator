@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>QR Studio Pro Max</title>
 
-  <!-- PWA Meta Tags -->
+  <!-- PWA Settings -->
+  <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#020617" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="QR Studio" />
   
-  <!-- CDN Scripts -->
+  <!-- CDN Scripts & Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -45,33 +46,6 @@
       box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.25);
     }
   </style>
-
-  <!-- Manifest Auto-Inject for PWA -->
-  <script>
-    const manifestJSON = {
-      name: "QR Code Studio Pro",
-      short_name: "QR Studio",
-      start_url: "./",
-      display: "standalone",
-      background_color: "#020617",
-      theme_color: "#020617",
-      icons: [
-        {
-          src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2306b6d4'/><path d='M25 25h20v20h-20zM55 25h20v20h-20zM25 55h20v20h-20zM55 55h10v10h-10zM65 65h10v10h-10z' fill='%23020617'/></svg>",
-          sizes: "192x192 512x512",
-          type: "image/svg+xml",
-          purpose: "any maskable"
-        }
-      ]
-    };
-    const stringManifest = JSON.stringify(manifestJSON);
-    const blob = new Blob([stringManifest], {type: 'application/json'});
-    const manifestURL = URL.createObjectURL(blob);
-    const linkTag = document.createElement('link');
-    linkTag.rel = 'manifest';
-    linkTag.href = manifestURL;
-    document.head.appendChild(linkTag);
-  </script>
 </head>
 
 <body class="text-slate-100 min-h-screen p-3 sm:p-6 md:p-8 flex flex-col items-center justify-start antialiased selection:bg-cyan-500 selection:text-black">
@@ -228,7 +202,7 @@
           <!-- 1. URL -->
           <div id="form-url" class="type-form space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">آدرس وب‌سایت یا لینک اینترنتی</label>
-            <input type="text" id="input-url" placeholder="https://example.com" value="https://github.com" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-xs sm:text-sm transition" />
+            <input type="text" id="input-url" placeholder="https://example.com" value="" class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 text-white text-left font-mono text-xs sm:text-sm transition" />
           </div>
 
           <!-- 2. BANK -->
@@ -322,8 +296,8 @@
           <div id="form-location" class="type-form hidden space-y-2.5">
             <label class="block text-xs font-bold text-slate-300">مختصات نقشه</label>
             <div class="grid grid-cols-2 gap-2.5">
-              <input type="number" step="any" id="loc-lat" placeholder="عرض (Lat) 35.6892" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-xs sm:text-sm transition" />
-              <input type="number" step="any" id="loc-lng" placeholder="طول (Lng) 51.3890" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-xs sm:text-sm transition" />
+              <input type="text" id="loc-lat" placeholder="عرض (Lat) 35.6892" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-xs sm:text-sm transition text-left" />
+              <input type="text" id="loc-lng" placeholder="طول (Lng) 51.3890" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-xs sm:text-sm transition text-left" />
             </div>
           </div>
 
@@ -356,7 +330,7 @@
               </select>
               <input type="text" id="crypto-address" placeholder="آدرس والت (Address)" class="sm:col-span-2 w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-left text-xs transition" />
             </div>
-            <input type="number" step="any" id="crypto-amount" placeholder="مقدار پیش‌فرض (اختیاری)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-left text-xs transition" />
+            <input type="text" id="crypto-amount" placeholder="مقدار پیش‌فرض (اختیاری)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white font-mono text-left text-xs transition" />
           </div>
 
         </div>
@@ -429,28 +403,35 @@
         <div class="glass-panel p-3 rounded-2xl border border-dashed border-slate-700/80 flex items-center justify-between">
           <div>
             <span class="block text-xs font-bold text-slate-200">لوگو یا آیکون اختصاصی</span>
-            <span class="block text-[10px] text-slate-400">بدون کاهش خوانایی</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/20 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1 active:scale-95 shadow-sm">
-              <span>انتخاب لوگو</span>
-              <input type="file" id="logo-input" accept="image/*" class="hidden" />
-            </label>
-            <button id="remove-logo" class="hidden text-xs bg-rose-950/40 border border-rose-800/60 text-rose-400 px-2.5 py-1.5 rounded-xl hover:bg-rose-900/60 transition active:scale-95">
-              حذف
-            </button>
+            <span class HD بنر - 3000px</option>
+            </select>
           </div>
         </div>
 
-      </div>
+        <!-- Color Palette -->
+        <div class="grid grid-cols-2 gap-3">
+          <div class="glass-panel p-3 rounded-2xl border border-slate-800/80 flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-300">رنگ کد</span>
+            <div class="flex items-center gap-2">
+              <input type="color" id="qr-color" value="#000000" class="w-7 h-7 rounded-lg cursor-pointer bg-transparent border border-slate-700/80" />
+              <span id="qr-color-val" class="font-mono text-xs text-slate-300 uppercase font-semibold">#000000</span>
+            </div>
+          </div>
 
-      <!-- Live Preview & Output (Column 2) -->
-      <div class="lg:col-span-5 flex flex-col items-center justify-between border-t lg:border-t-0 lg:border-r border-slate-800/80 pt-5 lg:pt-0 lg:pr-5">
-        
-        <div class="w-full flex flex-col items-center">
-          <div class="flex items-center justify-between w-full max-w-[260px] mb-2 px-1">
-            <span class="text-xs font-bold text-slate-400">پیش‌نمایش زنده</span>
-            <span class="text-[10px] bg-cyan-950/80 border border-cyan-800/50 text-cyan-300 px-2 py-0.5 rounded-full font-mono font-bold">Ultra Crisp</span>
+          <div class="glass-panel p-3 rounded-2xl border border-slate-800/80 flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-300">رنگ زمینه</span>
+            <div class="flex items-center gap-2">
+              <input type="color" id="bg-color" value="#ffffff" class="w-7 h-7 rounded-lg cursor-pointer bg-transparent border border-slate-700/80" />
+              <span id="bg-color-val" class="font-mono text-xs text-slate-300 uppercase font-semibold">#FFFFFF</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Logo Upload -->
+        <div class="glass-panel p-3 rounded-2xl border border-dashed border-slate-700/80 flex items-center justify-between">
+          <div>
+            <span class="block text-xs font-bold text-slate-200">لوگو یا آیکون اختصاصی</span>
+            <span classbold">Ultra Crisp</span>
           </div>
 
           <!-- QR Canvas Container -->
@@ -484,6 +465,18 @@
     let activeType = "url";
     let logoDataUrl = "";
     let deferredPrompt = null;
+
+    // تبدیل هوشمند ارقام فارسی و عربی به انگلیسی
+    function toEnglishDigits(str) {
+      if (!str) return "";
+      const persianDigits = [/۰/g, /۱/g, /۲/g, /۳/g, /۴/g, /۵/g, /۶/g, /۷/g, /۸/g, /۹/g];
+      const arabicDigits  = [/٠/g, /١/g, /٢/g, /٣/g, /٤/g, /٥/g, /٦/g, /٧/g, /٨/g, /٩/g];
+      let result = str.toString();
+      for (let i = 0; i < 10; i++) {
+        result = result.replace(persianDigits[i], i).replace(arabicDigits[i], i);
+      }
+      return result;
+    }
 
     // PWA Install Prompt
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -556,14 +549,16 @@
     // Format Generator for Standards (WiFi, SMS, vCard, Bank, etc.)
     function getFormattedPayload() {
       switch(activeType) {
-        case "url":
-          return document.getElementById("input-url").value.trim() || "https://github.com";
-        case "bank":
+        case "url": {
+          const val = document.getElementById("input-url").value.trim();
+          return val || "https://";
+        }
+        case "bank": {
           const bHolder = document.getElementById("bank-holder").value.trim();
           const bBank = document.getElementById("bank-name").value.trim();
-          const bCard = document.getElementById("bank-card").value.trim();
-          const bAcc = document.getElementById("bank-acc").value.trim();
-          let bIban = document.getElementById("bank-iban").value.trim().toUpperCase();
+          const bCard = toEnglishDigits(document.getElementById("bank-card").value.trim().replace(/[\s-]/g, ''));
+          const bAcc = toEnglishDigits(document.getElementById("bank-acc").value.trim());
+          let bIban = toEnglishDigits(document.getElementById("bank-iban").value.trim().replace(/\s/g, '')).toUpperCase();
           if (bIban && !bIban.startsWith("IR")) {
             bIban = "IR" + bIban;
           }
@@ -571,55 +566,68 @@
           let bankLines = [];
           if (bHolder) bankLines.push(`صاحب حساب: ${bHolder}`);
           if (bBank) bankLines.push(`بانک: ${bBank}`);
-          if (bCard) bankLines.push(`شماره کارت:\n${bCard}`);
+          if (bCard) {
+            const formattedCard = bCard.match(/.{1,4}/g)?.join(' ') || bCard;
+            bankLines.push(`شماره کارت:\n${formattedCard}`);
+          }
           if (bAcc) bankLines.push(`شماره حساب:\n${bAcc}`);
           if (bIban) bankLines.push(`شماره شبا:\n${bIban}`);
 
           return bankLines.length > 0 ? bankLines.join("\n\n") : "اطلاعات حساب بانکی";
-        case "text":
+        }
+        case "text": {
           return document.getElementById("input-text").value.trim() || " ";
-        case "wifi":
+        }
+        case "wifi": {
           const ssid = document.getElementById("wifi-ssid").value.trim();
           const pass = document.getElementById("wifi-pass").value.trim();
-          const enc = document.querySelector('input[name="wifi-type"]:checked').value;
+          const enc = document.querySelector('input[name="wifi-type"]:checked')?.value || 'WPA';
           return `WIFI:T:${enc};S:${ssid};P:${pass};;`;
-        case "phone":
-          const tel = document.getElementById("input-phone").value.trim();
-          return `tel:${tel}`;
-        case "sms":
-          const smsNum = document.getElementById("sms-phone").value.trim();
+        }
+        case "phone": {
+          const tel = toEnglishDigits(document.getElementById("input-phone").value.trim().replace(/[\s-]/g, ''));
+          return tel ? `tel:${tel}` : "tel:";
+        }
+        case "sms": {
+          const smsNum = toEnglishDigits(document.getElementById("sms-phone").value.trim().replace(/[\s-]/g, ''));
           const smsBody = document.getElementById("sms-body").value.trim();
           return `SMSTO:${smsNum}:${smsBody}`;
-        case "email":
+        }
+        case "email": {
           const to = document.getElementById("email-to").value.trim();
           const sub = encodeURIComponent(document.getElementById("email-subject").value.trim());
           const body = encodeURIComponent(document.getElementById("email-body").value.trim());
           return `mailto:${to}?subject=${sub}&body=${body}`;
-        case "vcard":
+        }
+        case "vcard": {
           const fn = document.getElementById("vcard-fn").value.trim();
-          const vtel = document.getElementById("vcard-tel").value.trim();
+          const vtel = toEnglishDigits(document.getElementById("vcard-tel").value.trim());
           const vemail = document.getElementById("vcard-email").value.trim();
           const vorg = document.getElementById("vcard-org").value.trim();
-          return `BEGIN:VCARD\nVERSION:3.0\nFN:${fn}\nORG:${vorg}\nTEL:${vtel}\nEMAIL:${vemail}\nEND:VCARD`;
-        case "location":
-          const lat = document.getElementById("loc-lat").value.trim() || "35.6892";
-          const lng = document.getElementById("loc-lng").value.trim() || "51.3890";
+          return `BEGIN:VCARD\nVERSION:3.0\nCHARSET=UTF-8\nFN:${fn}\nORG:${vorg}\nTEL:${vtel}\nEMAIL:${vemail}\nEND:VCARD`;
+        }
+        case "location": {
+          const lat = toEnglishDigits(document.getElementById("loc-lat").value.trim()) || "35.6892";
+          const lng = toEnglishDigits(document.getElementById("loc-lng").value.trim()) || "51.3890";
           return `https://www.google.com/maps?q=${lat},${lng}`;
-        case "event":
-          const title = document.getElementById("event-title").value.trim() || "Event";
+        }
+        case "event": {
+          const title = document.getElementById("event-title").value.trim() || "رویداد";
           const start = (document.getElementById("event-start").value || "").replace(/[-:]/g, "") + "00Z";
           const end = (document.getElementById("event-end").value || "").replace(/[-:]/g, "") + "00Z";
           const eloc = document.getElementById("event-location").value.trim();
           return `BEGIN:VEVENT\nSUMMARY:${title}\nDTSTART:${start}\nDTEND:${end}\nLOCATION:${eloc}\nEND:VEVENT`;
-        case "crypto":
+        }
+        case "crypto": {
           const coin = document.getElementById("crypto-coin").value;
           const addr = document.getElementById("crypto-address").value.trim();
-          const amt = document.getElementById("crypto-amount").value.trim();
+          const amt = toEnglishDigits(document.getElementById("crypto-amount").value.trim());
           if (coin === "bitcoin") return `bitcoin:${addr}${amt ? '?amount='+amt : ''}`;
           if (coin === "ethereum") return `ethereum:${addr}${amt ? '?value='+amt : ''}`;
           return `${coin}:${addr}${amt ? '?amount='+amt : ''}`;
+        }
         default:
-          return "https://github.com";
+          return "https://";
       }
     }
 
@@ -630,6 +638,9 @@
       margin: parseInt(document.getElementById("qr-margin").value) || 25,
       type: "canvas",
       data: getFormattedPayload(),
+      qrOptions: {
+        errorCorrectionLevel: 'Q'
+      },
       dotsOptions: {
         color: document.getElementById("qr-color").value,
         type: document.getElementById("dots-type").value
@@ -678,12 +689,12 @@
     });
 
     document.getElementById("qr-color").addEventListener("input", (e) => {
-      document.getElementById("qr-color-val").textContent = e.target.value;
+      document.getElementById("qr-color-val").textContent = e.target.value.toUpperCase();
       updateQR();
     });
 
     document.getElementById("bg-color").addEventListener("input", (e) => {
-      document.getElementById("bg-color-val").textContent = e.target.value;
+      document.getElementById("bg-color-val").textContent = e.target.value.toUpperCase();
       updateQR();
     });
 
@@ -719,6 +730,9 @@
         height: targetSize,
         margin: exportMargin,
         data: getFormattedPayload(),
+        qrOptions: {
+          errorCorrectionLevel: 'Q'
+        },
         dotsOptions: {
           color: document.getElementById("qr-color").value,
           type: document.getElementById("dots-type").value
@@ -756,13 +770,10 @@
       });
     });
 
-    // Service Worker for Offline / PWA
+    // Offline Service Worker Registration
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        const swBlob = new Blob([
-          `self.addEventListener('fetch', function(e) { e.respondWith(fetch(e.request).catch(function() { return caches.match(e.request); })); });`
-        ], { type: 'application/javascript' });
-        navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
   </script>
