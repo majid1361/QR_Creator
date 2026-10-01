@@ -1,4 +1,4 @@
-const CACHE_NAME = 'qr-studio-v2';
+const CACHE_NAME = 'qr-studio-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,14 +8,17 @@ const ASSETS_TO_CACHE = [
   'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap'
 ];
 
+// مرحله نصب و کش اولیه
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
+      // استفاده از Promise.allSettled یا addAll امن
       return cache.addAll(ASSETS_TO_CACHE);
     }).then(() => self.skipWaiting())
   );
 });
 
+// پاکسازی کش‌های قدیمی
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -30,6 +33,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// استراتژی کش: اول کش (Cache First) برای سرعت بالا و کارکرد آفلاین قطعی
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
@@ -37,7 +41,8 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
       return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+        // ذخیره درخواست‌های جدید حتی از نوع cors
+        if (!networkResponse || networkResponse.status !== 200) {
           return networkResponse;
         }
         const responseToCache = networkResponse.clone();
@@ -46,7 +51,8 @@ self.addEventListener('fetch', (event) => {
         });
         return networkResponse;
       }).catch(() => {
-        // Fallback for offline usage
+        // در حالت آفلاین اگر فایلی پیدا نشد
+        return caches.match('./index.html');
       });
     })
   );
