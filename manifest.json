@@ -2,7 +2,7 @@
   "name": "QR Code Studio Pro",
   "short_name": "QR Studio",
   "description": "استودیو ساخت حرفه‌ای QR کد بدون واسطه",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
