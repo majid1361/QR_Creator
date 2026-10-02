@@ -292,8 +292,8 @@
               <input type="url" id="vcard-instagram" placeholder="اینستاگرام (لینک پروفایل)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
               <input type="url" id="vcard-whatsapp" placeholder="واتساپ (لینک wa.me)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
               <input type="url" id="vcard-telegram" placeholder="تلگرام (لینک t.me)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
-              <input type="url" id="vcard-bale" placeholder="بله (لینک ble.ir یا آیدی)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
-              <input type="url" id="vcard-eitaa" placeholder="ایتا (لینک eitaa.com یا آیدی)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
+              <input type="url" id="vcard-bale" placeholder="بله (لینک پروفایل / گفتگو)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
+              <input type="url" id="vcard-eitaa" placeholder="ایتا (لینک پروفایل / گفتگو)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
               <input type="url" id="vcard-location" placeholder="لوکیشن به صورت لینک (Google Maps)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
               <textarea id="vcard-bio" rows="2" placeholder="توضیحات / بیو" class="sm:col-span-2 w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition"></textarea>
             </div>
@@ -610,135 +610,46 @@
           return `mailto:${to}?subject=${sub}&body=${body}`;
         }
         case "vcard": {
-          // Standard vCard 3.0 compatible with Samsung Camera, iOS Camera, Google Lens, etc.
+          // RFC 6350-style escaping/folding, serialized as a vCard 3.0 text with CRLF lines.
           const get = id => document.getElementById(id).value.trim();
-          const escapeText = value => String(value || "")
-            .replace(/\/g, "\\")
-            .replace(/
-?
-/g, "\n")
-            .replace(/,/g, "\,")
-            .replace(/;/g, "\;");
-
+          const escapeText = value => String(value || "").replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
           const lines = ["BEGIN:VCARD", "VERSION:3.0"];
-
           const fn = get("vcard-fn") || "بدون نام";
           lines.push(`FN;CHARSET=UTF-8:${escapeText(fn)}`);
           lines.push(`N;CHARSET=UTF-8:${escapeText(fn)};;;;`);
-
           const org = get("vcard-org");
-          if (org) lines.push(`ORG;CHARSET=UTF-8:${escapeText(org)}`);
-
           const title = get("vcard-title");
+          if (org) lines.push(`ORG;CHARSET=UTF-8:${escapeText(org)}`);
           if (title) lines.push(`TITLE;CHARSET=UTF-8:${escapeText(title)}`);
-
-          // Phone numbers (clean standard TEL)
           [...document.querySelectorAll("#vcard-phones input")]
             .map(i => toEnglishDigits(i.value.trim()))
             .filter(Boolean)
-            .forEach(phone => {
-              lines.push(`TEL;TYPE=CELL,VOICE:${escapeText(phone)}`);
-            });
-
+            .forEach(phone => lines.push(`TEL;TYPE=CELL:${escapeText(phone)}`));
           const email = get("vcard-email");
           if (email) lines.push(`EMAIL;TYPE=INTERNET:${escapeText(email)}`);
-
-          // Helpers for Social & Web links
-          const cleanUrl = value => {
-            const v = String(value || "").replace(/[
-	]/g, " ").trim();
-            return v;
-          };
-
-          const normalizeSocial = (value, prefix) => {
-            let v = String(value || "").replace(/[
-	]/g, " ").trim();
-            if (!v) return "";
-            v = v.replace(/^@/, "");
-            if (/^https?:///i.test(v)) return v;
-            if (/^wa\.me//i.test(v)) return "https://" + v;
-            return prefix + v;
-          };
-
-          // Website
-          let website = cleanUrl(get("vcard-website"));
-          if (website && !/^https?:///i.test(website)) {
-            website = /^(?:[a-z0-9-]+\.)+[a-z]{2,}(?::\d+)?(?:[/?#].*)?$/i.test(website)
-              ? "https://" + website : "";
-          }
-          if (website) lines.push(`URL;TYPE=WORK:${website}`);
-
-          // Location Link
-          const locationUrl = cleanUrl(get("vcard-location"));
-          if (locationUrl) lines.push(`URL;TYPE=HOME:${locationUrl}`);
-
-          // Standard X-SOCIALPROFILE tags
-          const instagramRaw = get("vcard-instagram");
-          if (instagramRaw) {
-            const instagram = normalizeSocial(instagramRaw, "https://instagram.com/");
-            const igUser = instagram.replace(/^https?://[^/]*instagram\.com//i, "").replace(/[/?#].*$/, "").replace(/^@/, "");
-            if (igUser) {
-              lines.push(`X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/${igUser}`);
-            }
-          }
-
-          const telegramRaw = get("vcard-telegram");
-          if (telegramRaw) {
-            const telegram = normalizeSocial(telegramRaw, "https://t.me/");
-            const tgUser = telegram.replace(/^https?://[^/]*t\.me//i, "").replace(/[/?#].*$/, "").replace(/^@/, "");
-            if (tgUser) {
-              lines.push(`X-SOCIALPROFILE;TYPE=telegram:https://t.me/${tgUser}`);
-            }
-          }
-
-          const whatsappRaw = String(get("vcard-whatsapp") || "").replace(/[
-	 -]/g, "").trim();
-          if (whatsappRaw) {
-            let waDigits = "";
-            if (/^https?://wa\.me//i.test(whatsappRaw)) {
-              waDigits = whatsappRaw.replace(/^https?://wa\.me//i, "").replace(/\D/g, "");
-            } else {
-              const digits = toEnglishDigits(whatsappRaw).replace(/\D/g, "");
-              waDigits = digits.startsWith("0") ? "98" + digits.slice(1) : digits;
-            }
-            if (waDigits) {
-              lines.push(`X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${waDigits}`);
-            }
-          }
-
-          // Iranian Messengers & Bio inside clean NOTE
-          const eitaa = normalizeSocial(get("vcard-eitaa"), "https://eitaa.com/");
-          const bale = normalizeSocial(get("vcard-bale"), "https://ble.ir/");
+          // Social profiles and the map are encoded as URL properties (vCard 3.0-compatible).
+          [["vcard-website", "WORK"], ["vcard-instagram", "X-INSTAGRAM"],
+           ["vcard-whatsapp", "X-WHATSAPP"], ["vcard-telegram", "X-TELEGRAM"],
+           ["vcard-bale", "X-BALE"], ["vcard-eitaa", "X-EITAA"],
+           ["vcard-location", "X-LOCATION"]].forEach(([id, type]) => {
+            const url = get(id);
+            if (url) lines.push(`URL;TYPE=${type}:${url.replace(/[\r\n]/g, "")}`);
+          });
           const bio = get("vcard-bio");
-          const noteParts = [];
-          if (bio) noteParts.push(escapeText(bio));
-          if (eitaa) noteParts.push(`Eitaa: ${eitaa}`);
-          if (bale) noteParts.push(`Bale: ${bale}`);
-          if (noteParts.length) {
-            lines.push(`NOTE;CHARSET=UTF-8:${noteParts.join("\n")}`);
-          }
-
+          if (bio) lines.push(`NOTE;CHARSET=UTF-8:${escapeText(bio)}`);
           lines.push("END:VCARD");
-
-          // Standard RFC folding with CRLF endings
+          // vCard physical lines are limited to 75 UTF-8 octets; continuation lines start with one space.
           const folded = [];
           for (const line of lines) {
             let part = "", byteCount = 0;
             for (const char of line) {
               const size = new TextEncoder().encode(char).length;
-              if (byteCount + size > (part ? 75 : 74)) {
-                folded.push(part);
-                part = " " + char;
-                byteCount = 1 + size;
-              } else {
-                part += char;
-                byteCount += size;
-              }
+              if (byteCount + size > (part ? 75 : 74)) { folded.push(part); part = " " + char; byteCount = 1 + size; }
+              else { part += char; byteCount += size; }
             }
             folded.push(part);
           }
-          return folded.join("
-");
+          return folded.join("\r\n");
         }
         case "location": {
           const lat = toEnglishDigits(document.getElementById("loc-lat").value.trim()) || "35.6892";
