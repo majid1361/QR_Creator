@@ -610,106 +610,135 @@
           return `mailto:${to}?subject=${sub}&body=${body}`;
         }
         case "vcard": {
-          // RFC 6350-style escaping/folding, serialized as a vCard 3.0 text with CRLF lines.
+          // Standard vCard 3.0 compatible with Samsung Camera, iOS Camera, Google Lens, etc.
           const get = id => document.getElementById(id).value.trim();
-          const escapeText = value => String(value || "").replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
+          const escapeText = value => String(value || "")
+            .replace(/\/g, "\\")
+            .replace(/
+?
+/g, "\n")
+            .replace(/,/g, "\,")
+            .replace(/;/g, "\;");
+
           const lines = ["BEGIN:VCARD", "VERSION:3.0"];
+
           const fn = get("vcard-fn") || "بدون نام";
           lines.push(`FN;CHARSET=UTF-8:${escapeText(fn)}`);
           lines.push(`N;CHARSET=UTF-8:${escapeText(fn)};;;;`);
+
           const org = get("vcard-org");
-          const title = get("vcard-title");
           if (org) lines.push(`ORG;CHARSET=UTF-8:${escapeText(org)}`);
+
+          const title = get("vcard-title");
           if (title) lines.push(`TITLE;CHARSET=UTF-8:${escapeText(title)}`);
+
+          // Phone numbers (clean standard TEL)
           [...document.querySelectorAll("#vcard-phones input")]
             .map(i => toEnglishDigits(i.value.trim()))
             .filter(Boolean)
-            .forEach(phone => lines.push(`TEL;TYPE=CELL:${escapeText(phone)}`));
+            .forEach(phone => {
+              lines.push(`TEL;TYPE=CELL,VOICE:${escapeText(phone)}`);
+            });
+
           const email = get("vcard-email");
           if (email) lines.push(`EMAIL;TYPE=INTERNET:${escapeText(email)}`);
-          // --- Normalize social inputs into full clickable URLs -------------------
-          // Prevents bare usernames like "mjid_ranjbar" or "@mjid_ranjbar" from
-          // being written into URL fields (Samsung shows them as a raw "Website").
+
+          // Helpers for Social & Web links
           const cleanUrl = value => {
-            let v = String(value || "").replace(/[\r\n\t]/g, " ").trim();
-            if (!v) return "";
+            const v = String(value || "").replace(/[
+	]/g, " ").trim();
             return v;
           };
-          const normalizeSocial = (value, prefix) => {
-            let v = String(value || "").replace(/[\r\n\t]/g, " ").trim();
-            if (!v) return "";
-            v = v.replace(/^@/, "");                     // strip leading @
-            if (/^https?:\/\//i.test(v)) return v;       // already a full URL
-            if (/^wa\.me\//i.test(v)) return "https://" + v;
-            return prefix + v;                           // username -> full profile URL
-          };
-          const instagram = normalizeSocial(get("vcard-instagram"), "https://instagram.com/");
-          const telegram  = normalizeSocial(get("vcard-telegram"),  "https://t.me/");
-          const whatsappRaw = String(get("vcard-whatsapp") || "").replace(/[\r\n\t -]/g, "").trim();
-          let whatsapp = "";
-          if (whatsappRaw) {
-            if (/^https?:\/\//i.test(whatsappRaw)) whatsapp = whatsappRaw;
-            else {
-              const digits = toEnglishDigits(whatsappRaw).replace(/\D/g, "");
-              whatsapp = "https://wa.me/" + (digits.startsWith("0") ? "98" + digits.slice(1) : digits);
-            }
-          }
 
-          // --- Website: only genuine URLs belong here (full globe/Website entry) --
+          const normalizeSocial = (value, prefix) => {
+            let v = String(value || "").replace(/[
+	]/g, " ").trim();
+            if (!v) return "";
+            v = v.replace(/^@/, "");
+            if (/^https?:///i.test(v)) return v;
+            if (/^wa\.me//i.test(v)) return "https://" + v;
+            return prefix + v;
+          };
+
+          // Website
           let website = cleanUrl(get("vcard-website"));
-          // A Website value must be an actual absolute web URL, never a handle.
-          // Accept a host such as example.com by adding https://, but ignore bare IDs.
-          if (website && !/^https?:\/\//i.test(website)) {
+          if (website && !/^https?:///i.test(website)) {
             website = /^(?:[a-z0-9-]+\.)+[a-z]{2,}(?::\d+)?(?:[/?#].*)?$/i.test(website)
               ? "https://" + website : "";
           }
           if (website) lines.push(`URL;TYPE=WORK:${website}`);
 
-          // --- Social profiles: X-SOCIALPROFILE with x-user so iOS/Android pick
-          //     the correct app icon instead of a generic "Website" globe. --------
-          if (instagram) {
-            const igUser = instagram.replace(/^https?:\/\/[^\/]*instagram\.com\//i, "").replace(/[\/??].*$/, "").replace(/^@/, "");
-            lines.push(`X-SOCIALPROFILE;TYPE=instagram;x-user=${igUser.replace(/[,;:]/g, "")}:${instagram}`);
-          }
-          if (telegram) {
-            const tgUser = telegram.replace(/^https?:\/\/[^\/]*t\.me\//i, "").replace(/[\/??].*$/, "").replace(/^@/, "");
-            lines.push(`X-SOCIALPROFILE;TYPE=telegram;x-user=${tgUser.replace(/[,;:]/g, "")}:${telegram}`);
-            lines.push(`IMPP;X-SERVICE-TYPE=Telegram:telegram:${tgUser}`);
-          }
-          if (whatsapp) {
-            const waDigits = whatsapp.replace(/^https?:\/\/wa\.me\//i, "").replace(/\D/g, "");
-            lines.push(`X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${waDigits}`);
-            lines.push(`IMPP;X-SERVICE-TYPE=WhatsApp:whatsapp:+${waDigits}`);
-            lines.push(`TEL;TYPE=CELL,VOICE;X-WHATSAPP=TRUE:+${waDigits}`); // dedicated tel entry for WhatsApp
-          }
-
-          // --- Location link ------------------------------------------------------
+          // Location Link
           const locationUrl = cleanUrl(get("vcard-location"));
-          if (locationUrl) lines.push(`URL;TYPE=X-LOCATION:${locationUrl}`);
+          if (locationUrl) lines.push(`URL;TYPE=HOME:${locationUrl}`);
 
-          // --- Iranian messengers (Eitaa / Bale): no native contact-app icons,
-          //     so expose them as clearly labeled, clickable full links in NOTE. --
+          // Standard X-SOCIALPROFILE tags
+          const instagramRaw = get("vcard-instagram");
+          if (instagramRaw) {
+            const instagram = normalizeSocial(instagramRaw, "https://instagram.com/");
+            const igUser = instagram.replace(/^https?://[^/]*instagram\.com//i, "").replace(/[/?#].*$/, "").replace(/^@/, "");
+            if (igUser) {
+              lines.push(`X-SOCIALPROFILE;TYPE=instagram:https://instagram.com/${igUser}`);
+            }
+          }
+
+          const telegramRaw = get("vcard-telegram");
+          if (telegramRaw) {
+            const telegram = normalizeSocial(telegramRaw, "https://t.me/");
+            const tgUser = telegram.replace(/^https?://[^/]*t\.me//i, "").replace(/[/?#].*$/, "").replace(/^@/, "");
+            if (tgUser) {
+              lines.push(`X-SOCIALPROFILE;TYPE=telegram:https://t.me/${tgUser}`);
+            }
+          }
+
+          const whatsappRaw = String(get("vcard-whatsapp") || "").replace(/[
+	 -]/g, "").trim();
+          if (whatsappRaw) {
+            let waDigits = "";
+            if (/^https?://wa\.me//i.test(whatsappRaw)) {
+              waDigits = whatsappRaw.replace(/^https?://wa\.me//i, "").replace(/\D/g, "");
+            } else {
+              const digits = toEnglishDigits(whatsappRaw).replace(/\D/g, "");
+              waDigits = digits.startsWith("0") ? "98" + digits.slice(1) : digits;
+            }
+            if (waDigits) {
+              lines.push(`X-SOCIALPROFILE;TYPE=whatsapp:https://wa.me/${waDigits}`);
+            }
+          }
+
+          // Iranian Messengers & Bio inside clean NOTE
           const eitaa = normalizeSocial(get("vcard-eitaa"), "https://eitaa.com/");
-          const bale  = normalizeSocial(get("vcard-bale"),  "https://ble.ir/");
+          const bale = normalizeSocial(get("vcard-bale"), "https://ble.ir/");
           const bio = get("vcard-bio");
           const noteParts = [];
           if (bio) noteParts.push(escapeText(bio));
           if (eitaa) noteParts.push(`Eitaa: ${eitaa}`);
           if (bale) noteParts.push(`Bale: ${bale}`);
-          if (noteParts.length) lines.push(`NOTE;CHARSET=UTF-8:${noteParts.join("\\n")}`);
+          if (noteParts.length) {
+            lines.push(`NOTE;CHARSET=UTF-8:${noteParts.join("\n")}`);
+          }
+
           lines.push("END:VCARD");
-          // vCard physical lines are limited to 75 UTF-8 octets; continuation lines start with one space.
+
+          // Standard RFC folding with CRLF endings
           const folded = [];
           for (const line of lines) {
             let part = "", byteCount = 0;
             for (const char of line) {
               const size = new TextEncoder().encode(char).length;
-              if (byteCount + size > (part ? 75 : 74)) { folded.push(part); part = " " + char; byteCount = 1 + size; }
-              else { part += char; byteCount += size; }
+              if (byteCount + size > (part ? 75 : 74)) {
+                folded.push(part);
+                part = " " + char;
+                byteCount = 1 + size;
+              } else {
+                part += char;
+                byteCount += size;
+              }
             }
             folded.push(part);
           }
-          return folded.join("\r\n");
+          return folded.join("
+");
         }
         case "location": {
           const lat = toEnglishDigits(document.getElementById("loc-lat").value.trim()) || "35.6892";
