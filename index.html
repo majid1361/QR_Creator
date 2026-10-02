@@ -283,9 +283,19 @@
             <label class="block text-xs font-bold text-slate-300">کارت ویزیت مخاطب (vCard)</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               <input type="text" id="vcard-fn" placeholder="نام و نام خانوادگی" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
-              <input type="tel" id="vcard-tel" placeholder="شماره تماس" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
+              <div id="vcard-phones" class="space-y-2.5"></div>
+              <button type="button" id="add-vcard-phone" class="col-span-1 sm:col-span-2 flex items-center justify-center gap-2 py-2 rounded-xl border border-dashed border-cyan-400/50 text-cyan-300 text-xs font-bold hover:bg-cyan-500/10 transition">➕ افزودن شماره تماس</button>
               <input type="email" id="vcard-email" placeholder="ایمیل" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left text-xs sm:text-sm transition" />
-              <input type="text" id="vcard-org" placeholder="نام شرکت / شغل" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
+              <input type="text" id="vcard-org" placeholder="نام شرکت / سازمان" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
+              <input type="text" id="vcard-title" placeholder="عنوان شغلی" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition" />
+              <input type="url" id="vcard-website" placeholder="وب‌سایت (https://example.com)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
+              <input type="url" id="vcard-instagram" placeholder="اینستاگرام (لینک پروفایل)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
+              <input type="url" id="vcard-whatsapp" placeholder="واتساپ (لینک wa.me)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
+              <input type="url" id="vcard-telegram" placeholder="تلگرام (لینک t.me)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
+              <input type="url" id="vcard-bale" placeholder="بله (لینک پروفایل / گفتگو)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
+              <input type="url" id="vcard-eitaa" placeholder="ایتا (لینک پروفایل / گفتگو)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
+              <input type="url" id="vcard-location" placeholder="لوکیشن به صورت لینک (Google Maps)" class="w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition" />
+              <textarea id="vcard-bio" rows="2" placeholder="توضیحات / بیو" class="sm:col-span-2 w-full px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-xs sm:text-sm transition"></textarea>
             </div>
           </div>
 
@@ -600,11 +610,46 @@
           return `mailto:${to}?subject=${sub}&body=${body}`;
         }
         case "vcard": {
-          const fn = document.getElementById("vcard-fn").value.trim();
-          const vtel = toEnglishDigits(document.getElementById("vcard-tel").value.trim());
-          const vemail = document.getElementById("vcard-email").value.trim();
-          const vorg = document.getElementById("vcard-org").value.trim();
-          return `BEGIN:VCARD\nVERSION:3.0\nFN;CHARSET=UTF-8:${fn}\nORG;CHARSET=UTF-8:${vorg}\nTEL:${vtel}\nEMAIL:${vemail}\nEND:VCARD`;
+          // RFC 6350-style escaping/folding, serialized as a vCard 3.0 text with CRLF lines.
+          const get = id => document.getElementById(id).value.trim();
+          const escapeText = value => String(value || "").replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
+          const lines = ["BEGIN:VCARD", "VERSION:3.0"];
+          const fn = get("vcard-fn") || "بدون نام";
+          lines.push(`FN;CHARSET=UTF-8:${escapeText(fn)}`);
+          lines.push(`N;CHARSET=UTF-8:${escapeText(fn)};;;;`);
+          const org = get("vcard-org");
+          const title = get("vcard-title");
+          if (org) lines.push(`ORG;CHARSET=UTF-8:${escapeText(org)}`);
+          if (title) lines.push(`TITLE;CHARSET=UTF-8:${escapeText(title)}`);
+          [...document.querySelectorAll("#vcard-phones input")]
+            .map(i => toEnglishDigits(i.value.trim()))
+            .filter(Boolean)
+            .forEach(phone => lines.push(`TEL;TYPE=CELL:${escapeText(phone)}`));
+          const email = get("vcard-email");
+          if (email) lines.push(`EMAIL;TYPE=INTERNET:${escapeText(email)}`);
+          // Social profiles and the map are encoded as URL properties (vCard 3.0-compatible).
+          [["vcard-website", "WORK"], ["vcard-instagram", "X-INSTAGRAM"],
+           ["vcard-whatsapp", "X-WHATSAPP"], ["vcard-telegram", "X-TELEGRAM"],
+           ["vcard-bale", "X-BALE"], ["vcard-eitaa", "X-EITAA"],
+           ["vcard-location", "X-LOCATION"]].forEach(([id, type]) => {
+            const url = get(id);
+            if (url) lines.push(`URL;TYPE=${type}:${url.replace(/[\r\n]/g, "")}`);
+          });
+          const bio = get("vcard-bio");
+          if (bio) lines.push(`NOTE;CHARSET=UTF-8:${escapeText(bio)}`);
+          lines.push("END:VCARD");
+          // vCard physical lines are limited to 75 UTF-8 octets; continuation lines start with one space.
+          const folded = [];
+          for (const line of lines) {
+            let part = "", byteCount = 0;
+            for (const char of line) {
+              const size = new TextEncoder().encode(char).length;
+              if (byteCount + size > (part ? 75 : 74)) { folded.push(part); part = " " + char; byteCount = 1 + size; }
+              else { part += char; byteCount += size; }
+            }
+            folded.push(part);
+          }
+          return folded.join("\r\n");
         }
         case "location": {
           const lat = toEnglishDigits(document.getElementById("loc-lat").value.trim()) || "35.6892";
@@ -686,6 +731,37 @@
     document.querySelectorAll("input, select, textarea").forEach(input => {
       input.addEventListener("input", updateQR);
       input.addEventListener("change", updateQR);
+    });
+
+    // vCard: Dynamic phone numbers
+    const phonesContainer = document.getElementById("vcard-phones");
+    const addPhoneBtn = document.getElementById("add-vcard-phone");
+
+    function createPhoneRow() {
+      const row = document.createElement("div");
+      row.className = "flex items-center gap-2";
+      const input = document.createElement("input");
+      input.type = "tel";
+      input.placeholder = "شماره تماس";
+      input.className = "vcard-phone-input flex-1 px-3.5 py-2 bg-slate-900/90 border border-slate-700/70 rounded-xl focus:border-cyan-400 text-white text-left font-mono text-xs sm:text-sm transition";
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.textContent = "🗑";
+      removeBtn.title = "حذف شماره";
+      removeBtn.className = "shrink-0 w-9 h-9 flex items-center justify-center rounded-xl border border-red-500/40 text-red-400 hover:bg-red-500/10 transition";
+      removeBtn.addEventListener("click", () => {
+        row.remove();
+        updateQR();
+      });
+      input.addEventListener("input", updateQR);
+      row.appendChild(input);
+      row.appendChild(removeBtn);
+      phonesContainer.appendChild(row);
+    }
+
+    addPhoneBtn.addEventListener("click", () => {
+      createPhoneRow();
+      updateQR();
     });
 
     document.getElementById("qr-color").addEventListener("input", (e) => {
