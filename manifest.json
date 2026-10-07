@@ -1,6 +1,6 @@
 {
-  "name": "QR Code Studio Pro",
-  "short_name": "QR Studio",
+  "name": "QR Studio Pro Max",
+  "short_name": "QR Studio Pro Max",
   "description": "استودیو ساخت حرفه‌ای QR کد بدون واسطه",
   "start_url": "./index.html",
   "scope": "./",
