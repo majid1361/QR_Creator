@@ -1,4 +1,4 @@
-const CACHE_NAME = 'qr-studio-v4';
+const CACHE_NAME = 'qr-studio-v5';
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -39,7 +39,7 @@ self.addEventListener('install', (event) => {
   })());
 });
 
-// Remove prior worker caches after the v4 cache has been created.
+// Remove prior worker caches after the v5 cache has been created.
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => Promise.all(
@@ -48,8 +48,26 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Cache first, then network; cache successful responses when possible.
+// Network-First for HTML to propagate UI updates, Cache-First for static assets
 self.addEventListener('fetch', (event) => {
+  const isHtml = event.request.mode === 'navigate' || event.request.url.includes('index.html');
+
+  if (isHtml) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache)).catch(() => {});
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request).then((res) => res || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Cache-First for assets and external scripts
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) return cachedResponse;
