@@ -15,7 +15,7 @@
   <!-- CDN Scripts & Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     body { 
@@ -41,6 +41,9 @@
     }
     .glow-cyan {
       box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.25);
+    }
+    .font-brand {
+      font-family: 'JetBrains Mono', monospace;
     }
   </style>
 </head>
@@ -461,6 +464,14 @@
     </div>
   </div>
 
+  <!-- Developer Credit Signature (Clean, Minimal, Modern) -->
+  <footer class="w-full max-w-4xl mt-6 pb-2 flex justify-end items-center px-2">
+    <div dir="ltr" class="group inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-slate-900/40 border border-slate-800/40 text-[10px] font-brand tracking-[0.16em] text-slate-500 hover:text-cyan-400 hover:border-cyan-500/30 transition-all duration-300 select-none">
+      <span class="opacity-60 text-[9px]">Developed by</span>
+      <span class="font-semibold text-slate-300 group-hover:text-cyan-300 transition-colors">Majid Ranjbar</span>
+    </div>
+  </footer>
+
   <script>
     let activeType = "url";
     let logoDataUrl = "";
@@ -844,18 +855,14 @@
       });
     });
 
-    // Offline Service Worker Registration
+    // Offline Service Worker Registration with Auto-Update Check
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          reg.update(); // 
+        }).catch(() => {});
       });
     }
   </script>
-      <!-- Developer Credit Signature -->
-  <footer class="w-full max-w-4xl mt-6 pb-2 flex justify-end items-center">
-    <div dir="ltr" class="text-[10px] font-mono tracking-[0.15em] text-slate-600/70 hover:text-cyan-400 transition-colors duration-300 select-none">
-      Developed&nbsp;by&nbsp;<span class="font-semibold text-slate-500">Majid Ranjbar</span>
-    </div>
-  </footer>
 </body>
 </html>
