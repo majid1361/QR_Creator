@@ -13,31 +13,46 @@
   <meta name="apple-mobile-web-app-title" content="QR Studio Pro Max" />
   
   <!-- CDN Scripts & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <script defer type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
     body { 
       font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
       -webkit-tap-highlight-color: transparent;
-      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 75%, #000000 100%);
-      background-attachment: fixed;
+      background-color: #020617;
     }
+    
+    /* لایه اختصاصی سخت‌افزاری برای پس‌زمینه بدون افت فریم در اسکرول */
+    .bg-gradient-fixed {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 75%, #000000 100%);
+      transform: translateZ(0);
+      will-change: transform;
+    }
+
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
     input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
     
     .glass-card {
-      background: rgba(15, 23, 42, 0.7);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.08);
+      transform: translateZ(0);
     }
     .glass-panel {
-      background: rgba(2, 6, 23, 0.75);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border: 1px solid rgba(255, 255, 255, 0.06);
+      transform: translateZ(0);
     }
     .glow-cyan {
       box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.25);
@@ -48,7 +63,10 @@
   </style>
 </head>
 
-<body class="text-slate-100 min-h-screen p-3 sm:p-6 md:p-8 flex flex-col items-center justify-start antialiased selection:bg-cyan-500 selection:text-black">
+<body class="text-slate-100 min-h-screen p-3 sm:p-6 md:p-8 flex flex-col items-center justify-start antialiased selection:bg-cyan-500 selection:text-black relative">
+
+  <!-- لایه گرافیکی پس‌زمینه (Zero Repaint GPU Layer) -->
+  <div class="bg-gradient-fixed"></div>
 
   <!-- Mobile Install Banner -->
   <div id="install-banner" class="hidden w-full max-w-4xl mb-4 glass-card border-cyan-500/30 rounded-2xl p-3.5 flex items-center justify-between shadow-2xl transition-all">
@@ -476,6 +494,7 @@
     let activeType = "url";
     let logoDataUrl = "";
     let deferredPrompt = null;
+    let qrCode = null;
 
     // تبدیل هوشمند ارقام فارسی و عربی به انگلیسی
     function toEnglishDigits(str) {
@@ -621,7 +640,6 @@
           return `mailto:${to}?subject=${sub}&body=${body}`;
         }
         case "vcard": {
-          // RFC 6350-style escaping/folding, serialized as a vCard 3.0 text with CRLF lines.
           const get = id => document.getElementById(id).value.trim();
           const escapeText = value => String(value || "").replace(/\\/g, "\\\\").replace(/\r?\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
           const lines = ["BEGIN:VCARD", "VERSION:3.0"];
@@ -638,7 +656,6 @@
             .forEach(phone => lines.push(`TEL;TYPE=CELL:${escapeText(phone)}`));
           const email = get("vcard-email");
           if (email) lines.push(`EMAIL;TYPE=INTERNET:${escapeText(email)}`);
-          // Social profiles and the map are encoded as URL properties (vCard 3.0-compatible).
           [["vcard-website", "WORK"], ["vcard-instagram", "X-INSTAGRAM"],
            ["vcard-whatsapp", "X-WHATSAPP"], ["vcard-telegram", "X-TELEGRAM"],
            ["vcard-bale", "X-BALE"], ["vcard-eitaa", "X-EITAA"],
@@ -649,7 +666,6 @@
           const bio = get("vcard-bio");
           if (bio) lines.push(`NOTE;CHARSET=UTF-8:${escapeText(bio)}`);
           lines.push("END:VCARD");
-          // vCard physical lines are limited to 75 UTF-8 octets; continuation lines start with one space.
           const folded = [];
           for (const line of lines) {
             let part = "", byteCount = 0;
@@ -687,37 +703,43 @@
       }
     }
 
-    // Initialize QR Code Styling Engine
-    const qrCode = new QRCodeStyling({
-      width: 240,
-      height: 240,
-      margin: parseInt(document.getElementById("qr-margin").value) || 25,
-      type: "canvas",
-      data: fixPersian(getFormattedPayload()),
-      qrOptions: {
-        errorCorrectionLevel: 'Q'
-      },
-      dotsOptions: {
-        color: document.getElementById("qr-color").value,
-        type: document.getElementById("dots-type").value
-      },
-      backgroundOptions: {
-        color: document.getElementById("bg-color").value,
-      },
-      cornersSquareOptions: {
-        type: document.getElementById("corners-type").value
-      },
-      imageOptions: {
-        crossOrigin: "anonymous",
-        margin: 4,
-        imageSize: 0.35
+    function initQR() {
+      if (typeof QRCodeStyling === 'undefined') {
+        setTimeout(initQR, 50);
+        return;
       }
-    });
+      qrCode = new QRCodeStyling({
+        width: 240,
+        height: 240,
+        margin: parseInt(document.getElementById("qr-margin").value) || 25,
+        type: "canvas",
+        data: fixPersian(getFormattedPayload()),
+        qrOptions: {
+          errorCorrectionLevel: 'Q'
+        },
+        dotsOptions: {
+          color: document.getElementById("qr-color").value,
+          type: document.getElementById("dots-type").value
+        },
+        backgroundOptions: {
+          color: document.getElementById("bg-color").value,
+        },
+        cornersSquareOptions: {
+          type: document.getElementById("corners-type").value
+        },
+        imageOptions: {
+          crossOrigin: "anonymous",
+          margin: 4,
+          imageSize: 0.35
+        }
+      });
 
-    const container = document.getElementById("canvas-container");
-    qrCode.append(container);
+      const container = document.getElementById("canvas-container");
+      qrCode.append(container);
+    }
 
     function updateQR() {
+      if (!qrCode) return;
       const payload = getFormattedPayload();
       const marginVal = parseInt(document.getElementById("qr-margin").value) || 0;
       
@@ -808,6 +830,7 @@
 
     // Guaranteed High-Resolution Downloads
     document.getElementById("btn-png").addEventListener("click", async () => {
+      if (!qrCode) return;
       const btn = document.getElementById("btn-png");
       const originalText = btn.innerHTML;
       btn.innerText = "⏳ در حال آماده‌سازی...";
@@ -817,7 +840,6 @@
         const currentMargin = parseInt(document.getElementById("qr-margin").value) || 25;
         const exportMargin = Math.round(currentMargin * (targetSize / 240));
 
-        // ارتقای سایز به رزولوشن بالا برای ذخیره‌سازی
         await qrCode.update({
           width: targetSize,
           height: targetSize,
@@ -826,7 +848,6 @@
 
         await qrCode.download({ name: `qr-${activeType}-${Date.now()}`, extension: "png" });
 
-        // بازگردانی به اندازه پیش‌نمایش در صفحه
         await qrCode.update({
           width: 240,
           height: 240,
@@ -840,6 +861,7 @@
     });
 
     document.getElementById("btn-svg").addEventListener("click", async () => {
+      if (!qrCode) return;
       await qrCode.download({ name: `qr-${activeType}-${Date.now()}`, extension: "svg" });
     });
 
@@ -855,11 +877,16 @@
       });
     });
 
-    // Offline Service Worker Registration with Auto-Update Check
+    // Startup Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      initQR();
+    });
+
+    // Offline Service Worker Registration
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').then((reg) => {
-          reg.update(); // 
+          reg.update();
         }).catch(() => {});
       });
     }
