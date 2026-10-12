@@ -1,4 +1,6 @@
-const CACHE_NAME = 'qr-studio-v5';
+const CACHE_NAME = 'qr-studio-v6';
+
+// فایل‌های الزامی ریشه و پروژه
 const LOCAL_ASSETS = [
   './',
   './index.html',
@@ -6,77 +8,124 @@ const LOCAL_ASSETS = [
   './icon-192.png',
   './icon-512.png'
 ];
+
+// اسکریپت‌ها و منابع خارجی حیاتی برای عملکرد آفلاین
 const EXTERNAL_ASSETS = [
   'https://cdn.tailwindcss.com',
   'https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js',
   'https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap'
 ];
 
-// Keep installation independent of optional third-party CDN availability.
+// ۱. مرحله Install: تضمین لود شدن استاتیک‌ها بدون گیر کردن روی CDNهای کند یا فیلتر
 self.addEventListener('install', (event) => {
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    // These same-origin files are required; a failure here should fail installation.
-    await cache.addAll(LOCAL_ASSETS);
-
-    // Cache CDN resources one-by-one with a bounded timeout. Any external failure
-    // is non-fatal, so the worker can still install and activate reliably.
-    await Promise.all(EXTERNAL_ASSETS.map(async (url) => {
-      try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000);
-        try {
-          const response = await fetch(url, { mode: 'cors', signal: controller.signal });
-          if (response && response.ok) await cache.put(url, response);
-        } finally {
-          clearTimeout(timeout);
-        }
-      } catch (error) {
-        // Optional CDN resource unavailable; continue installing.
-      }
-    }));
-    await self.skipWaiting();
-  })());
-});
-
-// Remove prior worker caches after the v5 cache has been created.
-self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(
-      keys.map((key) => key !== CACHE_NAME ? caches.delete(key) : Promise.resolve())
-    )).then(() => self.clients.claim())
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+
+      // فایل‌های محلی اجباری هستند
+      await cache.addAll(LOCAL_ASSETS);
+
+      // فایل‌های CDN اختیاری کَش می‌شوند تا اینستال لنگ نماند
+      await Promise.allSettled(
+        EXTERNAL_ASSETS.map(async (url) => {
+          try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 6000);
+            
+            // درخواست با مود cors/no-cors هوشمند برای گرفتن فونت و CDNها
+            const response = await fetch(url, {
+              mode: 'cors',
+              credentials: 'omit',
+              signal: controller.signal
+            }).finally(() => clearTimeout(timeout));
+
+            if (response && (response.ok || response.type === 'opaque')) {
+              await cache.put(url, response);
+            }
+          } catch (err) {
+            // در صورت قطعی اینترنت در اولین اینستال، نصب لغو نمی‌شود
+          }
+        })
+      );
+
+      await self.skipWaiting();
+    })()
   );
 });
 
-// Network-First for HTML to propagate UI updates, Cache-First for static assets
-self.addEventListener('fetch', (event) => {
-  const isHtml = event.request.mode === 'navigate' || event.request.url.includes('index.html');
+// ۲. مرحله Activate: پاکسازی اتوماتیک کش‌های قدیمی (v5 و قبل از آن)
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
+      await self.clients.claim();
+    })()
+  );
+});
 
+// ۳. مرحله Fetch: مدیریت درخواست‌ها بر اساس نوع منبع
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+
+  // فقط درخواست‌های GET هندل شوند (جلوگیری از خطای افزونه‌ها و متدهای POST)
+  if (req.method !== 'GET') return;
+
+  // فیلتر کردن پروتکل‌های متفرقه مثل chrome-extension
+  if (!req.url.startsWith('http')) return;
+
+  const url = new URL(req.url);
+  const isHtml = req.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname === '/';
+
+  // استراتژی Network-First برای HTML (همیشه آخرین آپدیت لود شود اما در آفلاین بالا بیاید)
   if (isHtml) {
     event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
+      (async () => {
+        try {
+          const networkResponse = await fetch(req);
           if (networkResponse && networkResponse.status === 200) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache)).catch(() => {});
+            const cache = await caches.open(CACHE_NAME);
+            cache.put(req, networkResponse.clone());
           }
           return networkResponse;
-        })
-        .catch(() => caches.match(event.request).then((res) => res || caches.match('./index.html')))
+        } catch (error) {
+          // در صورت آفلاین بودن، از کش می‌خواند
+          const cached = await caches.match(req);
+          if (cached) return cached;
+          return caches.match('./index.html', { ignoreSearch: true });
+        }
+      })()
     );
     return;
   }
 
-  // Cache-First for assets and external scripts
+  // استراتژی Stale-While-Revalidate / Cache-First برای فونت‌ها و اسکریپت‌ها
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200) return networkResponse;
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache)).catch(() => {});
+    (async () => {
+      // اول کش چک شود
+      const cachedResponse = await caches.match(req, { ignoreSearch: true });
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      // در صورت نبودن در کش، دانلود شده و ذخیره شود (از جمله فونت‌های woff2 گوگل)
+      try {
+        const networkResponse = await fetch(req);
+        if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(req, networkResponse.clone());
+        }
         return networkResponse;
-      }).catch(() => caches.match('./index.html'));
-    })
+      } catch (err) {
+        // برای دارایی‌هایی مثل فونت/عکس، برگرداندن HTML اشتباه است؛ پاسخ خالی یا خطا بدهد
+        return new Response('', { status: 408, statusText: 'Resource Unavailable Offline' });
+      }
+    })()
   );
 });
