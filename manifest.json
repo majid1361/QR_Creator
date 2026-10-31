@@ -1,15 +1,19 @@
 {
   "name": "QR Studio Pro Max",
   "short_name": "QR Studio",
-  "description": "استودیو ساخت حرفه‌ای QR کد بدون واسطه",
-  "id": "/",
-  "start_url": "./index.html",
+  "description": "استودیو حرفه‌ای ساخت کیوآر کد با پشتیبانی از انواع فرمت‌ها و خروجی وکتور",
+  "id": "./",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
   "background_color": "#020617",
   "theme_color": "#020617",
   "dir": "rtl",
   "lang": "fa",
+  "categories": ["utilities", "productivity", "tools"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "./icon-192.png",
